@@ -1,0 +1,241 @@
+/* chart styles. Loaded after globals.css; unlayered, so these rules win over @layer components. Tokens only, no raw colours. */
+:root {
+  --chart-night: var(--pine); /* night veil: always drawn at a very low opacity */
+  --chart-comet: var(--gold-pale); /* the bright head that leads a route as it inks in */
+  --chart-glow: color-mix(in srgb, var(--jade) 26%, transparent); /* halo under a hovered route */
+  --backdrop-line: color-mix(in srgb, var(--jade) 14%, var(--hairline));
+  --backdrop-coast: color-mix(in srgb, var(--jade) 24%, var(--hairline));
+}
+
+/* ── Night veil: three stacked layers give a soft twilight edge without a blur filter ── */
+.hub-night,
+.living-night {
+  fill: var(--chart-night);
+  stroke: none;
+  pointer-events: none;
+}
+.hub-night {
+  fill-opacity: 0.045;
+}
+.hub-night-veil {
+  animation: hub-fade 0.6s linear backwards;
+}
+
+/* ── Hub marker: a slow gold ring breathes out from Hong Kong ── */
+.hub-home-pulse {
+  fill: none;
+  stroke-width: 1.4;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hub-pulse 3.2s cubic-bezier(0.2, 0, 0.2, 1) 1.4s infinite;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+@keyframes hub-pulse {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(3.6);
+  }
+}
+
+/* ── Routes: hover glow, soften the others, faded when the last connection is gone ── */
+.hub-route {
+  transition: opacity 0.25s var(--ease);
+}
+.hub-route-glow {
+  fill: none;
+  stroke: var(--chart-glow);
+  stroke-width: 11;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+  pointer-events: none;
+}
+.hub-route[data-active] .hub-route-glow,
+.hub-route:focus-visible .hub-route-glow {
+  opacity: 1;
+}
+.hub-chart[data-hover] .hub-route:not([data-active]) {
+  opacity: 0.45;
+}
+.hub-route-line,
+.hub-route-end,
+.hub-route-glyph {
+  transition:
+    opacity 0.3s var(--ease),
+    stroke-width 0.2s var(--ease);
+}
+.hub-route[data-faded] {
+  --mark: var(--unknown);
+}
+.hub-route[data-faded] .hub-route-line {
+  stroke: var(--unknown);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 7;
+  opacity: 0.6;
+}
+.hub-route[data-faded][data-active] .hub-route-line,
+.hub-route[data-faded]:focus-visible .hub-route-line {
+  stroke-width: 2.2;
+  opacity: 0.9;
+}
+/* Hollow marker: the status glyph leaves, the ring stays */
+.hub-route[data-faded] .hub-route-glyph {
+  opacity: 0;
+}
+.hub-route[data-faded] .hub-route-label {
+  fill: var(--unknown-ink);
+}
+.hub-route[data-faded] .hub-route-glow {
+  stroke: color-mix(in srgb, var(--unknown) 22%, transparent);
+}
+.hub-card-lost {
+  color: var(--unknown-ink);
+  font-weight: 500;
+}
+
+/* ── Comet: a pale-gold head runs down each route once as it inks in ── */
+.hub-comet {
+  fill: none;
+  stroke: var(--chart-comet);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.07 2;
+  stroke-dashoffset: -1.02; /* resting place: past the end, so nothing shows */
+  pointer-events: none;
+}
+.hub-chart[data-intro="play"] .hub-comet {
+  animation: hub-comet 0.5s var(--ease) var(--d, 0ms) both;
+}
+@keyframes hub-comet {
+  from {
+    stroke-dashoffset: 0.07;
+  }
+  to {
+    stroke-dashoffset: -1.02;
+  }
+}
+/* Another scenario came into focus: only the routes replay, without the lead-in */
+.hub-chart[data-intro="routes"] .hub-ink {
+  animation: hub-draw 0.45s var(--ease) calc(var(--d, 350ms) - 350ms) backwards;
+}
+.hub-chart[data-intro="routes"] .hub-route-end {
+  animation: hub-fade 0.2s linear calc(var(--d, 350ms) - 350ms) backwards;
+}
+.hub-chart[data-intro="routes"] .hub-comet {
+  animation: hub-comet 0.5s var(--ease) calc(var(--d, 350ms) - 350ms) both;
+}
+
+/* ── Living backdrop: a near-white chart behind every page ── */
+.living-backdrop {
+  position: fixed;
+  inset: -16px; /* a margin to drift into, so no edge ever shows */
+  z-index: -1;
+  overflow: hidden;
+  background: var(--porcelain);
+  pointer-events: none;
+}
+.living-backdrop svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+.living-graticule {
+  fill: none;
+  stroke: var(--backdrop-line);
+  stroke-width: 1;
+  stroke-dasharray: 1 5;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.55;
+}
+.living-land {
+  fill: var(--paper);
+  fill-opacity: 0.7;
+  stroke: var(--backdrop-coast);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.6;
+}
+.living-night {
+  fill-opacity: 0.022;
+}
+.living-night-veil {
+  animation: hub-fade 1.2s linear backwards;
+}
+.living-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.4;
+}
+.living-hub {
+  fill: var(--gold-deep);
+  opacity: 0.45;
+}
+
+/* ── Arrival: the sign-in chart stays while the session is verified, then glides into the band ── */
+.arrival-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+/* The "verifying" card appears only if verification is slow, so a quick sign-in shows just the chart */
+.arrival-backdrop + .service-error {
+  animation: arrival-card 0.3s linear 0.7s backwards;
+}
+@keyframes arrival-card {
+  from {
+    opacity: 0;
+  }
+}
+.arrival-glide {
+  position: relative;
+  transform-origin: 0 0;
+}
+.arrival-glide[data-gliding] {
+  z-index: 5;
+  will-change: transform;
+}
+.arrival-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  animation: arrival-dissolve 0.5s var(--ease) 0.06s both;
+}
+/* Only one element may carry the cross-page transition name at a time */
+.arrival-veil .hub-chart {
+  view-transition-name: none;
+}
+@keyframes arrival-dissolve {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-home-pulse,
+  .hub-comet,
+  .arrival-veil {
+    display: none;
+  }
+  .living-backdrop svg {
+    transform: none !important;
+  }
+}
+
+/* The arrival glide carries the map from sign-in into the console, so the
+   browser's own cross-document transition is switched off (it raced the glide). */
+@view-transition {
+  navigation: none;
+}

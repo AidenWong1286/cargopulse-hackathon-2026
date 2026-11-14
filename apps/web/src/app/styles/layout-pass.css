@@ -1,0 +1,552 @@
+/* layout-pass styles. Loaded after globals.css; unlayered, so these rules win over @layer components. Tokens only, no raw colours. */
+
+/* Readability pass: larger body text, sentence-case labels, a two-group sidebar,
+   one disclaimer line in the top bar, the one-click start card and folded detail. */
+
+:root {
+  --rail: 232px;
+  --rail-open: 232px;
+  --jade-glow: 0 0 0 4px color-mix(in srgb, var(--jade) 14%, transparent),
+    0 6px 18px color-mix(in srgb, var(--jade) 24%, transparent);
+}
+@media (max-width: 1180px) {
+  :root {
+    --rail: 204px;
+    --rail-open: 204px;
+  }
+}
+
+/* ── Type sizes ── */
+body {
+  font-size: 15px;
+}
+td {
+  font-size: 14.5px;
+}
+small {
+  font-size: 13px;
+}
+th {
+  font-size: 12.5px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.chip,
+.badge {
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.button {
+  font-size: 14px;
+}
+.button.large {
+  min-height: 52px;
+  padding: 12px 26px;
+  font-size: 16px;
+}
+.section-heading,
+.panel h2,
+.panel h3,
+label,
+summary,
+caption {
+  letter-spacing: 0;
+  text-transform: none;
+}
+td strong,
+td.nowrap,
+.row-button {
+  white-space: nowrap;
+}
+.console-table table {
+  min-width: 0;
+}
+
+/* Stale, review-required and escalated states ask for attention, not alarm. */
+.chip.warn,
+.badge.warn {
+  --chip: var(--verify);
+  --chip-bg: var(--verify-tint);
+  --chip-ink: var(--verify-ink);
+}
+.reasons {
+  text-decoration: underline dotted var(--hairline-strong);
+  text-underline-offset: 3px;
+}
+
+/* ── Primary buttons: a soft jade glow answers hover and keyboard focus ── */
+.button.primary {
+  transition:
+    background-color 0.12s linear,
+    border-color 0.12s linear,
+    box-shadow 0.2s var(--ease);
+}
+.button.primary:hover:not(:disabled):not([aria-disabled="true"]),
+.button.primary:focus-visible {
+  box-shadow: var(--jade-glow);
+}
+
+/* ── Sidebar: two things to do, then records and settings ── */
+.rail {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.rail-brand {
+  flex: none;
+  height: 60px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 0 20px;
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.rail nav,
+.rail:hover nav,
+.rail nav:has(:focus-visible) {
+  position: static;
+  flex: 1;
+  width: auto;
+  gap: 0;
+  padding: 16px 12px;
+  overflow: visible;
+  border-right: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+.nav-primary,
+.nav-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rail-link > svg {
+  margin: 0;
+}
+.nav-primary .rail-link {
+  align-items: flex-start;
+  gap: 12px;
+  height: auto;
+  min-height: 62px;
+  padding: 11px 12px;
+  color: var(--ink);
+  white-space: normal;
+}
+.nav-primary .rail-link > svg {
+  margin-top: 1px;
+  color: var(--jade-ink);
+}
+.nav-primary .rail-link > span {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.nav-primary .rail-link strong {
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.nav-primary .rail-link small {
+  display: block;
+  color: var(--ink-dim);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+.nav-label {
+  margin: 26px 12px 8px;
+  color: var(--ink-dim);
+  font-size: 13px;
+  font-weight: 500;
+}
+.nav-secondary .rail-link {
+  gap: 12px;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 14.5px;
+}
+.rail-next {
+  flex: none;
+  margin: 0;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--hairline);
+  color: var(--ink-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── Top bar: one disclaimer line ── */
+.topbar {
+  height: auto;
+  min-height: 60px;
+  gap: 18px;
+  padding-block: 8px;
+}
+.demo-line {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.demo-flag {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 26px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--verify) 40%, transparent);
+  border-radius: 999px;
+  background: var(--verify-tint);
+  color: var(--verify-ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.demo-note {
+  min-width: 0;
+  color: var(--ink-dim);
+  font-size: 13.5px;
+  line-height: 1.3;
+}
+.account {
+  font-size: 14px;
+  white-space: nowrap;
+}
+.account strong {
+  display: inline;
+  font-size: 14px;
+}
+.boundary p + p {
+  padding-left: 0;
+  border-left: 0;
+}
+
+/* ── Recovery desk: one-click start ── */
+.start-card {
+  position: relative;
+  margin-bottom: 24px;
+  padding: 24px 28px 24px 31px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-hero);
+  background: var(--paper);
+  box-shadow: var(--shadow-panel);
+}
+/* The thin gold edge marks the page's one primary action. */
+.start-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--gold-sheen);
+}
+.start-card-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+.start-card h2 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+:lang(zh-Hant) .start-card h2 {
+  font-size: 24px;
+  font-weight: 500;
+}
+.start-card p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--ink-dim);
+}
+.start-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 20px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--hairline);
+  list-style: none;
+  font-size: 14px;
+}
+.start-steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-dim);
+}
+.start-step-mark {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--hairline-strong);
+  border-radius: 50%;
+  color: var(--on-jade);
+}
+.start-steps li[data-state="done"] {
+  color: var(--ink);
+}
+.start-steps li[data-state="done"] .start-step-mark {
+  border-color: var(--pass);
+  background: var(--pass);
+}
+.start-steps li[data-state="current"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+.start-steps li[data-state="current"] .start-step-mark {
+  border-color: var(--jade);
+}
+/* The dot beats only while that request is really in flight. */
+.start-steps li[data-state="current"] .start-step-mark::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--jade);
+  animation: start-beat 0.9s var(--ease) infinite alternate;
+}
+@keyframes start-beat {
+  from {
+    transform: scale(0.55);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.start-card .start-hint {
+  margin-top: 12px;
+  font-size: 14px;
+}
+.start-card .notice {
+  margin: 16px 0 0;
+}
+
+/* Stagger order for the entrance defined in desk.css (.rise uses --i). */
+.rise-1 {
+  --i: 1;
+}
+.rise-2 {
+  --i: 2;
+}
+.rise-3 {
+  --i: 3;
+}
+
+/* ── Scenario list tools, inside the section ── */
+.toolbar.slim {
+  gap: 12px;
+  margin: 0 0 16px;
+}
+.toolbar.slim label {
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+.toolbar.slim label:first-child {
+  max-width: 440px;
+}
+
+/* ── Folded detail ── */
+details.manual {
+  margin-top: 28px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hairline);
+}
+details.manual > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 4px;
+  color: var(--jade-ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+details.manual > summary::-webkit-details-marker,
+details.fold > summary::-webkit-details-marker {
+  display: none;
+}
+details.manual > summary::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.2s var(--ease);
+}
+details.manual[open] > summary {
+  margin-bottom: 14px;
+}
+details.manual[open] > summary::before {
+  transform: rotate(45deg);
+}
+details.fold {
+  margin-bottom: 12px;
+  padding: 0;
+}
+details.fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 12px var(--pad);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+details.fold > summary::before {
+  content: "+";
+  flex: none;
+  width: 18px;
+  color: var(--jade-ink);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+}
+details.fold[open] > summary::before {
+  content: "–";
+}
+.fold-count {
+  min-width: 30px;
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--mist);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.fold-body {
+  padding: 16px var(--pad) var(--pad);
+  border-top: 1px solid var(--hairline);
+}
+.fold-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* ── Smaller windows ── */
+@media (max-width: 1520px) {
+  .hub-clock > span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 1050px) {
+  .demo-note {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  /* The sidebar becomes a strip above the page, its two groups laid out in rows. */
+  :root {
+    --rail: 0px;
+  }
+  .app {
+    padding-bottom: 0;
+  }
+  .rail {
+    position: static;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .rail-brand {
+    display: flex;
+    height: 52px;
+    padding: 0 16px;
+    border-bottom: 0;
+  }
+  .rail nav,
+  .rail:hover nav,
+  .rail nav:has(:focus-visible) {
+    flex-direction: column;
+    justify-content: flex-start;
+    width: auto;
+    padding: 0 12px 12px;
+  }
+  .nav-primary,
+  .nav-secondary {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .nav-primary .rail-link {
+    flex: 1 1 150px;
+    align-items: center;
+    min-height: 46px;
+    padding: 8px 12px;
+  }
+  .nav-primary .rail-link small {
+    display: none;
+  }
+  .nav-label {
+    margin: 12px 4px 6px;
+  }
+  .nav-secondary .rail-link {
+    height: 38px;
+    padding: 0 10px;
+    gap: 8px;
+  }
+  .rail-link > span {
+    display: flex;
+  }
+  .rail-link > svg {
+    margin: 0;
+  }
+  .rail-link[aria-current="page"]::before {
+    top: 8px;
+    right: auto;
+    bottom: 8px;
+    left: 0;
+    width: 3px;
+    height: auto;
+  }
+  .rail-next {
+    display: none;
+  }
+  .start-card {
+    padding: 20px 20px 20px 23px;
+  }
+  .start-card .button.large {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button.primary,
+  details.manual > summary::before {
+    transition: none;
+  }
+  .start-steps li[data-state="current"] .start-step-mark::after {
+    animation: none;
+  }
+}

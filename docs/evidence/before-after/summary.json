@@ -1,0 +1,214 @@
+{
+  "generated_at": "2026-11-14T16:12:52+00:00",
+  "git_revision": "174632d5bd070a7f912aac520e0ef2fc16311008",
+  "solver": "HiGHS 1.15.1",
+  "python": "3.12.16",
+  "runtime_seconds": 1051.4,
+  "statistics": "paired percentile bootstrap (10,000), Wilcoxon signed-rank, exact sign test, Holm",
+  "holm_adjusted_secondary_p": {
+    "Protect: billable weight": 3.012272901980429e-162,
+    "Protect: billable weight at 8% overbooking": 3.684380619053692e-163,
+    "Recover: total delay cost": 2.1106622062162353e-34
+  },
+  "protect": {
+    "design": {
+      "awbs_per_flight": 150,
+      "calibration_seeds": [
+        800001,
+        800200
+      ],
+      "test_seeds": [
+        900001,
+        901000
+      ],
+      "flights": 1000,
+      "target_reference_offload_rate": 0.1128,
+      "calibrated_overbooking": 0.116821,
+      "calibration_set_rule_offload_rate": 0.1128,
+      "trimmed_overbooking": 0.08
+    },
+    "primary_offload_rate": {
+      "before_rule_pct": {
+        "estimate": 11.2387,
+        "ci95": [
+          11.1147,
+          11.3667
+        ]
+      },
+      "after_cargopulse_pct": {
+        "estimate": 6.5267,
+        "ci95": [
+          6.4993,
+          6.554
+        ]
+      },
+      "reduction_pp": {
+        "estimate": 4.712,
+        "ci95": [
+          4.5987,
+          4.83
+        ]
+      },
+      "relative_reduction_pct": {
+        "estimate": 41.9267,
+        "ci95": [
+          41.3517,
+          42.5158
+        ]
+      },
+      "per_flight_reduction_pp_mean": {
+        "estimate": 4.712,
+        "ci95": [
+          4.5987,
+          4.83
+        ]
+      },
+      "per_flight_reduction_pp_median": 4.6667,
+      "wilcoxon": {
+        "n_nonzero": 1000,
+        "z": 27.444,
+        "p": 8.153793377505373e-166
+      },
+      "sign_test": {
+        "better": 1000,
+        "worse": 0,
+        "ties": 0,
+        "p": 1.8665272370064378e-301
+      },
+      "false_positive_rate_under_sign_flip": 0.03
+    },
+    "secondary": {
+      "billable_weight_change_pct": {
+        "estimate": 1.3333,
+        "ci95": [
+          1.2908,
+          1.3763
+        ],
+        "wilcoxon": {
+          "n_nonzero": 1000,
+          "z": 27.169,
+          "p": 1.5061364509902145e-162
+        },
+        "sign_test": {
+          "better": 984,
+          "worse": 16,
+          "ties": 0,
+          "p": 8.037722162828744e-267
+        }
+      },
+      "trimmed_overbooking": {
+        "cargopulse_offload_rate_pct": {
+          "estimate": 4.7493,
+          "ci95": [
+            4.7247,
+            4.7747
+          ]
+        },
+        "one_sided_95_upper_bound_pct": 4.77,
+        "below_5pct_supported": true,
+        "billable_vs_rule_at_calibrated_pct": {
+          "estimate": 1.0859,
+          "ci95": [
+            1.046,
+            1.1261
+          ],
+          "wilcoxon": {
+            "n_nonzero": 999,
+            "z": 27.261,
+            "p": 1.2281268730178974e-163
+          },
+          "sign_test": {
+            "better": 978,
+            "worse": 21,
+            "ties": 1,
+            "p": 5.91668781710116e-258
+          }
+        }
+      },
+      "priority_or_express_offloaded": {
+        "before_rule": 0,
+        "after_cargopulse": 0
+      }
+    },
+    "integrity": {
+      "plans_independently_checked": 3000,
+      "plans_total": 3000,
+      "cargopulse_proven_optimal": 2000,
+      "cargopulse_runs": 2000,
+      "determinism_rerun_identical": true
+    }
+  },
+  "recover": {
+    "design": {
+      "ulds_per_disruption": 140,
+      "test_seeds": [
+        910001,
+        910200
+      ],
+      "scenarios": 200,
+      "generator": "random-hub-disruption-v1",
+      "before": "better of earliest-feasible and priority-first per disruption (conservative)"
+    },
+    "primary_ulds_placed": {
+      "before_mean": {
+        "estimate": 81.56,
+        "ci95": [
+          78.915,
+          84.27
+        ]
+      },
+      "after_mean": {
+        "estimate": 85.895,
+        "ci95": [
+          83.1399,
+          88.66
+        ]
+      },
+      "difference_mean": {
+        "estimate": 4.335,
+        "ci95": [
+          3.84,
+          4.865
+        ]
+      },
+      "wilcoxon": {
+        "n_nonzero": 160,
+        "z": 10.985,
+        "p": 4.512692915656859e-28
+      },
+      "sign_test": {
+        "better": 160,
+        "worse": 0,
+        "ties": 40,
+        "p": 1.3684555315672042e-48
+      },
+      "false_positive_rate_under_sign_flip": 0.09
+    },
+    "secondary": {
+      "total_delay_cost_change_pct": {
+        "estimate": -14.3046,
+        "ci95": [
+          -15.8156,
+          -12.8862
+        ],
+        "wilcoxon": {
+          "n_nonzero": 199,
+          "z": 12.231,
+          "p": 2.1106622062162353e-34
+        },
+        "sign_test": {
+          "better": 199,
+          "worse": 0,
+          "ties": 1,
+          "p": 2.4892061111444567e-60
+        }
+      }
+    },
+    "integrity": {
+      "scenarios_all_plans_validated": 200,
+      "cargopulse_proven_optimal": 198,
+      "cargopulse_never_worse_lexicographic": 200,
+      "determinism_rerun_identical": true
+    }
+  }
+}

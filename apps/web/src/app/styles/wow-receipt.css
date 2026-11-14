@@ -1,0 +1,1010 @@
+/* Wow moment: receipt (see components/fx/receipt-*.tsx, gold-flecks.tsx).
+   Verdict jewel card, paper air-waybill receipt with the gold-foil seal, glass
+   decision rail. Timeline numbers match receipt-awb.tsx (IMPACT = 2650 ms). */
+
+:root {
+  /* The receipt is a lit paper object: the same in day and night. */
+  --awb-paper: #fafbf7;
+  --awb-paper-edge: #eef2ec;
+  --awb-stub: #f0f4ef;
+  --awb-ink: #0e2b27;
+  --awb-dim: #4a5f59; /* 6.3:1 on paper */
+  --awb-rule: #c4d1ca;
+  --awb-rule-strong: #8fa39c;
+  --awb-hole: #d9e1dc;
+  --awb-band: #00645a;
+  --awb-on-band: #ffffff;
+  --awb-pass-ink: #0d6b4a;
+  --awb-fail-ink: #a2312a;
+  --awb-open-ink: #6b7c77;
+  --awb-shadow: rgba(14, 43, 39, 0.3);
+  --awb-shadow-soft: rgba(14, 43, 39, 0.12);
+
+  /* Seal inks (pressed under gold foil). Lettering is pale gold on deep ink. */
+  --seal-approve: #0b6157;
+  --seal-approve-deep: #043a33;
+  --seal-reject: #9a2e27;
+  --seal-reject-deep: #5a1712;
+  --seal-escalate: #8a5a12;
+  --seal-escalate-deep: #4e3207;
+  --seal-letter: #f6e9be;
+  --seal-shade: rgba(0, 0, 0, 0.42);
+  --seal-light: rgba(255, 255, 255, 0.55);
+  --seal-tick: rgba(110, 80, 20, 0.45);
+  --seal-glint: rgba(255, 255, 255, 0.9);
+
+  /* Verdict jewel card */
+  --verdict-bg-1: #0e2b27;
+  --verdict-bg-2: #0a3d36;
+  --verdict-glow: rgba(0, 121, 108, 0.55);
+  --verdict-ink: #f3f8f5;
+  --verdict-dim: #c3d6cf; /* ≥ 7:1 on the card */
+  --verdict-line: rgba(227, 201, 133, 0.28);
+  --verdict-pass: #8fe0b9;
+  --verdict-fail: #f5a29a;
+
+  --dr-highlight: rgba(255, 255, 255, 0.7);
+  --stage-pool: rgba(227, 201, 133, 0.16);
+}
+html[data-theme="night"] {
+  --verdict-bg-1: #06130f;
+  --verdict-bg-2: #0b3a33;
+  --verdict-glow: rgba(63, 191, 166, 0.35);
+  --dr-highlight: rgba(255, 255, 255, 0.08);
+  --stage-pool: rgba(246, 233, 190, 0.2);
+  --awb-shadow: rgba(0, 0, 0, 0.6);
+  --awb-shadow-soft: rgba(0, 0, 0, 0.35);
+}
+
+/* ───────────────────────── Verdict jewel card ───────────────────────── */
+.verdict-card {
+  margin: 0 0 20px;
+  padding: 28px 32px 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-hero);
+  overflow: hidden;
+  color: var(--verdict-ink);
+  background:
+    radial-gradient(120% 150% at 100% 0%, var(--verdict-glow) 0%, transparent 55%) padding-box,
+    linear-gradient(155deg, var(--verdict-bg-1) 0%, var(--verdict-bg-2) 100%) padding-box,
+    var(--gold-sheen) border-box;
+  box-shadow: var(--shadow-float);
+  /* backwards only: once landed, the foil tilt owns transform. */
+  animation: verdict-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+@keyframes verdict-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    filter: blur(4px);
+  }
+}
+.verdict-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    color-mix(in srgb, var(--gold-pale) 30%, transparent) 49%,
+    color-mix(in srgb, var(--gold) 18%, transparent) 53%,
+    transparent 64%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-110%);
+  animation: verdict-sweep 1.7s 0.45s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+@keyframes verdict-sweep {
+  to {
+    transform: translateX(110%);
+  }
+}
+.verdict-head {
+  position: relative;
+}
+.verdict-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--verdict-dim);
+}
+.verdict-rule {
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: var(--gold-sheen);
+}
+.verdict-tag {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid var(--verdict-line);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--verdict-dim);
+}
+.verdict-card .verdict-line {
+  max-width: 34ch;
+  margin: 12px 0 24px;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.1vw, 40px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: var(--verdict-ink);
+}
+.verdict-tiles {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--verdict-line);
+}
+.verdict-tile {
+  min-width: 0;
+  padding: 20px 22px 22px 0;
+}
+.verdict-tile + .verdict-tile {
+  padding-left: 22px;
+  border-left: 1px solid var(--verdict-line);
+}
+.verdict-tile > span {
+  display: block;
+  font-size: 13px;
+  color: var(--verdict-dim);
+}
+.verdict-tile > strong {
+  display: block;
+  margin: 10px 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 4.4vw, 58px);
+  font-weight: 400;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--verdict-ink);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+.verdict-tile > strong small {
+  margin-left: 6px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--verdict-dim);
+  text-shadow: none;
+}
+.verdict-tile > small {
+  display: block;
+  font-size: 13px;
+  color: var(--verdict-dim);
+}
+.verdict-check.is-pass > strong {
+  color: var(--verdict-pass);
+}
+.verdict-check.is-fail > strong {
+  color: var(--verdict-fail);
+}
+.verdict-check > strong::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 2px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: var(--gold-sheen);
+}
+/* The existing summary band sits inside the jewel as its lower strip. */
+.verdict-card .summary-grid {
+  position: relative;
+  margin: 0 -32px;
+  border: 0;
+  border-top: 1px solid var(--verdict-line);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--verdict-bg-1) 60%, transparent);
+  box-shadow: none;
+}
+.verdict-card .summary-grid > div {
+  border-right-color: var(--verdict-line);
+  padding-top: 16px;
+  padding-bottom: 18px;
+}
+.verdict-card .summary-grid span,
+.verdict-card .summary-grid small {
+  color: var(--verdict-dim);
+}
+.verdict-card .summary-grid strong {
+  font-size: 30px;
+  color: var(--verdict-ink);
+}
+.verdict-card .summary-grid strong.status-value {
+  font-size: 18px;
+}
+
+/* ───────────────────────── Receipt stage ───────────────────────── */
+.receipt-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  margin: 8px 0 28px;
+  padding: 26px 0 40px;
+  perspective: 1600px;
+  perspective-origin: 50% 0%;
+  scroll-margin-top: calc(var(--topbar) + 16px);
+}
+.receipt-stage::before {
+  content: "";
+  position: absolute;
+  inset: -10px 6% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--stage-pool), transparent);
+  pointer-events: none;
+}
+.receipt-stage.is-playing {
+  animation: stage-shake 0.3s 2650ms linear;
+}
+@keyframes stage-shake {
+  12% { transform: translate3d(-3px, 2px, 0); }
+  28% { transform: translate3d(3px, -2px, 0); }
+  44% { transform: translate3d(-2px, 1px, 0); }
+  62% { transform: translate3d(2px, -1px, 0); }
+  80% { transform: translate3d(-1px, 0, 0); }
+}
+.awb-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  width: min(820px, 88%);
+  height: 46px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--awb-shadow), transparent);
+  filter: blur(10px);
+  pointer-events: none;
+  animation: awb-shadow-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes awb-shadow-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.4, 0.6);
+  }
+}
+.awb-lift {
+  position: relative;
+  width: min(880px, 100%);
+  transform-origin: 50% 100%;
+  animation: awb-rise 1.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes awb-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 58%, -120px) rotateX(64deg) scale(0.84);
+  }
+  40% {
+    opacity: 1;
+  }
+  78% {
+    transform: translate3d(0, -1.2%, 0) rotateX(-3.5deg) scale(1.004);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The paper. Scope day tokens inside so chips/details render as printed ink. */
+.awb {
+  --ink: var(--awb-ink);
+  --ink-dim: var(--awb-dim);
+  --paper: var(--awb-paper);
+  --well: var(--awb-paper-edge);
+  --mist: var(--awb-paper-edge);
+  --hairline: var(--awb-rule);
+  --hairline-strong: var(--awb-rule-strong);
+  --pass: #1f8a5b;
+  --pass-ink: #17694a;
+  --pass-tint: #e6f3ec;
+  --verify: #b7791f;
+  --verify-ink: #7f5310;
+  --verify-tint: #faf1de;
+  --block: #b83a32;
+  --block-ink: #9a2e27;
+  --block-tint: #fbebe9;
+  --unknown-ink: #4f5f5b;
+  --unknown-tint: #eef1f0;
+  color-scheme: light;
+  display: block;
+  padding-top: 12px;
+  border-radius: 6px;
+  color: var(--awb-ink);
+  background:
+    radial-gradient(140% 90% at 50% 0%, transparent 60%, color-mix(in srgb, var(--awb-paper-edge) 90%, transparent) 100%),
+    linear-gradient(180deg, var(--awb-paper) 0%, var(--awb-paper) 70%, var(--awb-paper-edge) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 2px 4px var(--awb-shadow-soft),
+    0 24px 48px -18px var(--awb-shadow);
+}
+.awb > * {
+  position: relative;
+}
+.awb-grain {
+  position: absolute !important;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .06 0 0 0 0 .17 0 0 0 0 .15 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .3 0 0 0 0 .26 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+/* Torn top edge: a scalloped tear-off line above the paper. */
+.awb-tear {
+  position: absolute !important;
+  top: -7px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  pointer-events: none;
+  background: radial-gradient(circle at 7px 8px, var(--awb-paper) 5.5px, transparent 6px) 0 0 / 14px 8px repeat-x;
+}
+.awb-band {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 18px;
+  padding: 7px 14px;
+  border-radius: 3px;
+  background: var(--awb-band);
+  color: var(--awb-on-band);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.awb-band-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.awb-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 26px 14px;
+}
+.awb-kicker {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--awb-dim);
+}
+.awb .awb-title h3 {
+  margin: 4px 0 6px;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--awb-ink);
+}
+.awb-lede {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 14px;
+  color: var(--awb-dim);
+}
+
+/* AWB ruled boxes */
+.awb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 26px;
+  border-top: 1px solid var(--awb-rule-strong);
+  border-left: 1px solid var(--awb-rule);
+}
+.awb-field {
+  min-width: 0;
+  padding: 9px 12px 11px;
+  border-right: 1px solid var(--awb-rule);
+  border-bottom: 1px solid var(--awb-rule);
+}
+.awb-field dt {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--awb-dim);
+}
+.awb-field dd {
+  margin: 0;
+  min-height: 24px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.awb-mono,
+.awb-copy code {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--awb-ink);
+}
+.awb-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+.awb-copy code {
+  padding: 0;
+  background: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.awb-copy-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--awb-rule);
+  border-radius: 6px;
+  background: var(--awb-paper);
+  color: var(--awb-dim);
+  cursor: pointer;
+}
+.awb-copy-btn:hover {
+  border-color: var(--awb-band);
+  color: var(--awb-band);
+}
+.awb-copy-btn:focus-visible {
+  outline: 2px solid var(--awb-band);
+  outline-offset: 2px;
+}
+
+/* Gates A–H as stamped boxes */
+.awb-gates {
+  margin: 14px 26px 0;
+}
+.awb-gates-title {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--awb-dim);
+}
+.awb-gates ol {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.awb-gate {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: 6px 4px 7px;
+  border: 1px solid var(--awb-rule-strong);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--awb-paper) 70%, var(--awb-paper-edge));
+  animation: awb-ink 0.45s ease-out both;
+  animation-delay: calc(1350ms + var(--g) * 110ms);
+}
+.awb-gate-letter {
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--awb-dim);
+}
+.awb-gate-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 30px;
+  margin-top: 6px;
+  border: 2px solid currentColor;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+  transform: rotate(var(--r));
+  animation: gate-stamp 0.34s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  animation-delay: calc(1530ms + var(--g) * 110ms);
+}
+.awb-gate.is-pass .awb-gate-mark { color: var(--awb-pass-ink); }
+.awb-gate.is-fail .awb-gate-mark { color: var(--awb-fail-ink); }
+.awb-gate.is-open .awb-gate-mark { color: var(--awb-open-ink); border-style: dashed; }
+.awb-gate-name {
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--awb-dim);
+}
+@keyframes gate-stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.3) rotate(calc(var(--r) - 18deg));
+    filter: blur(2px);
+  }
+  70% {
+    opacity: 0.95;
+    transform: scale(0.94) rotate(var(--r));
+    filter: none;
+  }
+}
+@keyframes awb-ink {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+    filter: blur(3px);
+  }
+}
+.awb-field,
+.awb-gates-title,
+.awb-stub {
+  animation: awb-ink 0.6s ease-out both;
+  animation-delay: calc(520ms + var(--i, 0) * 70ms);
+}
+
+/* Perforation and the tear-off stub */
+.awb-perf {
+  height: 14px;
+  margin: 18px 10px 0;
+  background: radial-gradient(circle, var(--awb-hole) 0 2.6px, transparent 3.2px) 0 50% / 13px 14px repeat-x;
+}
+.awb-stub {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: end;
+  padding: 10px 26px 22px;
+  border-radius: 0 0 6px 6px;
+  background: color-mix(in srgb, var(--awb-stub) 70%, transparent);
+}
+.awb-external {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--awb-ink);
+}
+.awb-external::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--awb-band);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--awb-band) 18%, transparent);
+}
+.awb-fine {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--awb-dim);
+}
+.awb-stub .raw {
+  margin-top: 8px;
+}
+.awb-stub-code {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+.awb-bars {
+  width: 190px;
+  height: 34px;
+  fill: var(--awb-ink);
+  opacity: 0.85;
+}
+.awb-stub-code code {
+  padding: 0;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--awb-dim);
+}
+
+/* ───────────────────────── The gold-foil seal ───────────────────────── */
+.seal-spot {
+  position: relative;
+  width: 200px;
+  height: 190px;
+  justify-self: end;
+}
+.seal-spot-ring {
+  position: absolute;
+  inset: 12px 20px;
+  border: 1.5px dashed var(--awb-rule-strong);
+  border-radius: 50%;
+  animation: spot-hide 0.2s 2650ms linear forwards;
+}
+.seal-spot-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  text-align: center;
+  color: var(--awb-dim);
+  animation: spot-hide 0.2s 2650ms linear forwards;
+}
+.is-final .seal-spot-ring,
+.is-final .seal-spot-label {
+  opacity: 0;
+}
+@keyframes spot-hide {
+  to {
+    opacity: 0;
+  }
+}
+.seal {
+  --seal-ink: var(--seal-approve);
+  --seal-ink-deep: var(--seal-approve-deep);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 176px;
+  height: 176px;
+  margin: -88px 0 0 -88px;
+  transform: rotate(-12deg);
+  z-index: 1;
+  animation: seal-slam 0.56s 2247ms both;
+}
+.seal-reject {
+  --seal-ink: var(--seal-reject);
+  --seal-ink-deep: var(--seal-reject-deep);
+}
+.seal-escalate {
+  --seal-ink: var(--seal-escalate);
+  --seal-ink-deep: var(--seal-escalate-deep);
+}
+@keyframes seal-slam {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -150px, 0) scale(2.5) rotate(-38deg);
+    filter: blur(10px);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.4);
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(0.93) rotate(-10deg);
+    filter: blur(0);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  86% {
+    transform: scale(1.035) rotate(-12.6deg);
+  }
+  100% {
+    transform: rotate(-12deg);
+  }
+}
+/* The stamp's shadow tightening on the paper as it comes down. */
+.seal-cast {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--awb-shadow), transparent);
+  opacity: 0;
+  animation: seal-cast 0.42s 2247ms ease-in both;
+}
+@keyframes seal-cast {
+  0% {
+    opacity: 0;
+    transform: translate(40px, 50px) scale(1.9);
+    filter: blur(14px);
+  }
+  95% {
+    opacity: 0.7;
+    transform: translate(3px, 5px) scale(1);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* Ink pressed out beyond the rim on impact: spreads, then dries faint. */
+.seal-ink {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 18% 72%, color-mix(in srgb, var(--seal-ink) 45%, transparent) 0 3px, transparent 4px),
+    radial-gradient(circle at 84% 22%, color-mix(in srgb, var(--seal-ink) 40%, transparent) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 64%, color-mix(in srgb, var(--seal-ink) 35%, transparent) 0 1.5px, transparent 2.5px),
+    radial-gradient(closest-side, color-mix(in srgb, var(--seal-ink) 26%, transparent) 62%, color-mix(in srgb, var(--seal-ink) 10%, transparent) 82%, transparent 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  animation: seal-ink 0.95s 2650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes seal-ink {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+    filter: blur(1px);
+  }
+  18% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+    filter: blur(0.3px);
+  }
+}
+.seal-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  filter: drop-shadow(0 6px 10px var(--awb-shadow-soft));
+}
+.seal-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--gold-sheen);
+  box-shadow:
+    inset 0 2px 2px var(--seal-light),
+    inset 0 -3px 5px var(--seal-shade);
+}
+.seal-ticks {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--seal-tick) 0 1.1deg, transparent 1.1deg 5deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 87%, #000 88% 97%, transparent 98%);
+  mask: radial-gradient(circle, transparent 0 87%, #000 88% 97%, transparent 98%);
+}
+/* Living foil: a soft highlight orbits the gold ring. */
+.seal-glint {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 290deg, var(--seal-glint) 325deg, transparent 352deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 84.5%, #000 85.5%);
+  mask: radial-gradient(circle, transparent 0 84.5%, #000 85.5%);
+  mix-blend-mode: soft-light;
+  animation: seal-orbit 5.5s linear infinite;
+}
+@keyframes seal-orbit {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.seal-disc {
+  position: absolute;
+  inset: 13px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 28%,
+    color-mix(in srgb, var(--seal-ink) 72%, var(--seal-letter)) 0%,
+    var(--seal-ink) 42%,
+    var(--seal-ink-deep) 100%
+  );
+  box-shadow:
+    inset 0 3px 7px var(--seal-shade),
+    inset 0 -1px 0 var(--seal-light),
+    0 0 0 1px color-mix(in srgb, var(--seal-ink-deep) 60%, transparent);
+}
+.seal-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* Embossed: lettering raised out of the ink. */
+  filter: drop-shadow(0 1px 0 var(--seal-shade)) drop-shadow(0 -0.6px 0 var(--seal-light));
+}
+.seal-hair {
+  fill: none;
+  stroke: var(--seal-letter);
+  stroke-width: 0.8;
+  stroke-dasharray: 1.2 2.4;
+  opacity: 0.8;
+}
+.seal-ring-text {
+  font-family: var(--font-sans);
+  font-size: 9.4px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  fill: var(--seal-letter);
+}
+.seal-word {
+  font-family: var(--font-display);
+  font-size: 31px;
+  fill: var(--seal-letter);
+}
+.seal-sub {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  fill: var(--seal-letter);
+}
+.seal-icon {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  margin-left: -11px;
+  color: var(--seal-letter);
+  filter: drop-shadow(0 1px 0 var(--seal-shade));
+}
+
+/* Gold flecks canvas, centred on the seal (centre at 78% of its height). */
+.gold-flecks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 380px;
+  height: 480px;
+  transform: translate(-50%, -78%);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Skip / final state: every scripted animation jumps to its end. */
+.receipt-stage.is-final,
+.receipt-stage.is-final *:not(.seal-glint) {
+  animation: none !important;
+}
+html[data-fx="calm"] .seal-glint,
+html[data-fx="calm"] .verdict-sweep {
+  animation: none;
+  opacity: 0;
+}
+html[data-fx="calm"] .verdict-card {
+  animation: none;
+}
+html[data-fx="lite"] .awb-field,
+html[data-fx="lite"] .awb-gates-title,
+html[data-fx="lite"] .awb-stub {
+  animation-name: awb-fade;
+}
+@keyframes awb-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ───────────────────────── Glass decision rail ───────────────────────── */
+.decision-rail.dr-glass {
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--paper) 90%, transparent) 0%,
+      color-mix(in srgb, var(--paper) 70%, transparent) 55%,
+      color-mix(in srgb, var(--celadon) 45%, transparent) 100%
+    );
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--paper) 45%, var(--hairline));
+  box-shadow:
+    inset 0 1px 0 var(--dr-highlight),
+    var(--shadow-float);
+}
+.decision-rail.dr-glass::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 28px;
+  right: 28px;
+  height: 1px;
+  background: var(--gold-sheen);
+  pointer-events: none;
+}
+.decision-rail.dr-glass input:not([type="checkbox"]),
+.decision-rail.dr-glass select,
+.decision-rail.dr-glass textarea {
+  background-color: color-mix(in srgb, var(--paper) 92%, transparent);
+}
+.dr-recorded .button {
+  margin-top: 10px;
+}
+
+/* Record decision: jade with a gold sheen that sweeps across on hover. */
+.button.btn-gold-sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold-pale) 55%, transparent);
+  transition:
+    box-shadow 0.35s var(--ease),
+    background-color 0.2s var(--ease);
+}
+.button.btn-gold-sheen::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    color-mix(in srgb, var(--gold-pale) 70%, transparent) 45%,
+    color-mix(in srgb, var(--gold) 60%, transparent) 51%,
+    transparent 66%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-130%);
+  transition: transform 0.9s var(--ease);
+}
+.button.btn-gold-sheen:hover:not(:disabled)::after,
+.button.btn-gold-sheen:focus-visible:not(:disabled)::after {
+  transform: translateX(130%);
+}
+.button.btn-gold-sheen:hover:not(:disabled) {
+  box-shadow:
+    0 0 0 1px var(--gold),
+    0 10px 26px -8px color-mix(in srgb, var(--gold-deep) 70%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-pale) 80%, transparent);
+}
+html[data-fx="calm"] .button.btn-gold-sheen::after {
+  transition: none;
+  display: none;
+}
+
+/* ───────────────────────── Small screens ───────────────────────── */
+@media (max-width: 900px) {
+  .verdict-tiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .verdict-tile + .verdict-tile {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--verdict-line);
+  }
+  .verdict-card {
+    padding: 22px 20px 0;
+  }
+  .verdict-card .summary-grid {
+    margin: 0 -20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .awb-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .seal-spot {
+    justify-self: center;
+  }
+  .awb-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .awb-gates ol {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .awb-stub {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .awb-stub-code {
+    justify-items: start;
+  }
+}
+@media (max-width: 520px) {
+  .awb-grid {
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0 14px;
+  }
+  .awb-top,
+  .awb-stub {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .awb-gates {
+    margin: 14px 14px 0;
+  }
+  .verdict-tag {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .receipt-stage,
+  .receipt-stage *,
+  .verdict-card,
+  .verdict-sweep {
+    animation: none !important;
+  }
+}

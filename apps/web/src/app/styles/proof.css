@@ -1,0 +1,240 @@
+/* ── Random demo data on the start card ── */
+.start-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-top: 16px;
+}
+.start-options .inline-label input {
+  width: 120px;
+  min-height: 36px;
+  padding: 4px 10px;
+  font-variant-numeric: tabular-nums;
+}
+.start-options .inline-label select {
+  width: auto;
+  min-height: 36px;
+}
+.start-options .button {
+  min-height: 36px;
+  padding: 6px 14px;
+}
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-button);
+  background: var(--paper);
+}
+.segmented button {
+  min-height: 30px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.segmented button[aria-pressed="true"] {
+  background: var(--celadon);
+  color: var(--ink);
+  font-weight: 600;
+}
+.segmented button:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 1px;
+}
+
+/* ── Algorithm proof page ── */
+.proof-checks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.proof-checks article {
+  padding: 20px 22px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-panel);
+  background: var(--paper);
+  box-shadow: var(--shadow-panel);
+}
+.proof-checks h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.proof-checks p {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+.proof-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-bottom: 24px;
+}
+.proof-controls label {
+  margin-bottom: 0;
+  min-width: 240px;
+}
+.proof-controls .button {
+  min-height: 44px;
+}
+.proof-progress {
+  margin: 0;
+  padding-bottom: 10px;
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+.proof-board {
+  margin-bottom: 24px;
+}
+.proof-board-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 40px;
+}
+.proof-scatter {
+  margin: 0;
+}
+.proof-scatter svg {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+}
+.proof-grid {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+.proof-diagonal {
+  stroke: var(--gold-deep);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.proof-tick {
+  fill: var(--ink-dim);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.proof-axis {
+  fill: var(--ink);
+  font-size: 13px;
+}
+.proof-dot {
+  fill: var(--jade);
+  fill-opacity: 0.78;
+  stroke: var(--paper);
+  stroke-width: 2;
+  cursor: pointer;
+}
+.proof-dot[data-exact="MISMATCH"] {
+  fill: var(--block);
+}
+.proof-dot:focus-visible {
+  outline: none;
+  stroke: var(--pine);
+  stroke-width: 3;
+}
+.proof-caption {
+  max-width: 72ch;
+  margin-top: 8px;
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+.proof-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 1050px) {
+  .proof-checks,
+  .proof-board-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Contrast fixes found by the axe browser tests ── */
+/* The hint under the selected sidebar item sits on celadon; the dimmer ink was 4.4:1. */
+.nav-primary .rail-link[aria-current="page"] small {
+  color: var(--unknown-ink);
+}
+/* The start button becomes enabled once the session loads; fading the background from
+   the pale disabled colour left white text on a light fill for a moment. */
+.start-card .button.primary {
+  transition: box-shadow 0.2s var(--ease);
+}
+
+/* ── Protect proof ── */
+.proof-tabs {
+  margin-bottom: 24px;
+}
+.proof-tabs button {
+  min-height: 36px;
+  padding: 6px 18px;
+  font-size: 15px;
+}
+.proof-headline {
+  max-width: 80ch;
+  margin: 0 0 20px;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.proof-target {
+  stroke: var(--verify);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+.proof-line {
+  fill: none;
+  stroke-width: 2;
+}
+.proof-line.fill,
+.proof-key.fill::before {
+  stroke: var(--gold-deep);
+  background: var(--gold-deep);
+}
+.proof-line.opt,
+.proof-key.opt::before {
+  stroke: var(--jade);
+  background: var(--jade);
+}
+.proof-dot.fill {
+  fill: var(--gold-deep);
+}
+.proof-dot.opt {
+  fill: var(--jade);
+}
+.proof-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+.proof-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.proof-key::before {
+  content: "";
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+}
+.proof-fold-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.proof-controls input[type="number"] {
+  width: 140px;
+}

@@ -1,0 +1,658 @@
+/* Wow moment: Protect — 3D cargo hold hero, gauges, foil KPI tiles, glass inputs.
+   Components: components/fx/cargo-hold*.tsx, components/fx/gauge.tsx, components/protect.tsx.
+   Colours read by three.js must be plain hex (resolved through a probe element). */
+
+.wow-protect {
+  display: contents;
+  --viz-class-express: #7b55d4;
+  --hold-express: var(--viz-class-express);
+  --hold-priority: var(--viz-class-priority);
+  --hold-general: var(--viz-class-general);
+  --hold-shell: #fbfcfb;
+  --hold-metal: #c9d2ce;
+  --hold-floor: #dfe5e2;
+  --hold-rail: #aeb9b4;
+  --hold-gold: #e3c985;
+  --hold-spark: #c9a655;
+  --hold-sweep: #d9b45a;
+  --hold-edge: #ffffff;
+  --hold-shadow: #0e2b27;
+  --hold-light: #fffaf0;
+  --hold-stage-a: #ffffff;
+  --hold-stage-b: #eef3f0;
+  --hold-stage-floor: rgba(14, 43, 39, 0.1);
+  --gauge-jade-a: #00645a;
+  --gauge-jade-b: #1f8a76;
+  --gauge-face-a: #ffffff;
+  --gauge-face-b: #f1f5f2;
+  --gauge-track: #e9efeb;
+  --gauge-tick: #c9a655;
+  --chip-bg: rgba(255, 255, 255, 0.86);
+}
+html[data-theme="night"] .wow-protect {
+  --viz-class-express: #a48af0;
+  --hold-shell: #dfe7e4;
+  --hold-metal: #9fb0aa;
+  --hold-floor: #b7c4bf;
+  --hold-rail: #8a9a95;
+  --hold-spark: #f0d78f;
+  --hold-sweep: #f3dc95;
+  --hold-edge: #eef5f2;
+  --hold-shadow: #000000;
+  --hold-light: #f4f1e6;
+  --hold-stage-a: #173a34;
+  --hold-stage-b: #0a1c19;
+  --hold-stage-floor: rgba(0, 0, 0, 0.45);
+  --gauge-jade-a: #3fbfa6;
+  --gauge-jade-b: #7fdcc8;
+  --gauge-face-a: #17332e;
+  --gauge-face-b: #102622;
+  --gauge-track: #23443d;
+  --gauge-tick: #e3c985;
+  --chip-bg: rgba(16, 38, 34, 0.86);
+}
+
+/* ── Premium inputs: one frosted panel with a gold hairline ─────────────── */
+.wow-protect .wow-controls {
+  position: relative;
+  padding: 20px 24px 22px;
+  border-radius: var(--r-hero);
+  gap: 20px;
+  align-items: flex-end;
+}
+.wow-protect .wow-controls::before {
+  content: "";
+  position: absolute;
+  inset: 0 24px auto;
+  height: 1px;
+  background: var(--gold-sheen);
+  opacity: 0.9;
+}
+.wow-protect .wow-controls label {
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+}
+.wow-protect .wow-controls input {
+  height: 44px;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--r-control);
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+.wow-protect .wow-controls input:focus-visible {
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 35%, transparent);
+  outline: none;
+}
+.wow-protect .wow-controls .button.primary {
+  height: 44px;
+  padding-inline: 22px;
+  margin-left: auto;
+  position: relative;
+  overflow: hidden;
+}
+.wow-protect .wow-controls .button.primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, color-mix(in srgb, var(--gold-pale) 55%, transparent) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.9s var(--ease);
+  pointer-events: none;
+}
+.wow-protect .wow-controls .button.primary:hover::after {
+  transform: translateX(120%);
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hold-hero {
+  margin: 0 0 28px;
+  transition: opacity 0.3s var(--ease);
+}
+.hold-hero.is-busy {
+  opacity: 0.72;
+}
+.hold-hero__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: 16px;
+}
+.hold-hero__eyebrow {
+  margin: 0 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--ink-dim);
+}
+.hold-hero__synthetic {
+  font-weight: 600;
+  color: var(--verify-ink);
+}
+.hold-hero__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.hold-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Segmented policy toggle with a sliding jade thumb and gold edge. */
+.hold-seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-panel);
+  isolation: isolate;
+}
+.hold-seg__thumb {
+  position: absolute;
+  z-index: -1;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: var(--jade-fill);
+  box-shadow:
+    0 0 0 1px var(--gold),
+    0 6px 16px color-mix(in srgb, var(--jade) 30%, transparent);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hold-seg[data-active="1"] .hold-seg__thumb {
+  transform: translateX(100%);
+}
+.hold-seg button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 500 14px/1 var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.3s var(--ease);
+}
+.hold-seg button[aria-pressed="true"] {
+  color: var(--on-jade);
+}
+.hold-seg button:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 2px;
+}
+.hold-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-button);
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 14px/1 var(--font-sans);
+  cursor: pointer;
+}
+.hold-replay svg {
+  width: 18px;
+  height: 18px;
+  color: var(--gold-deep);
+}
+.hold-replay:hover {
+  border-color: var(--gold-deep);
+}
+
+.hold-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 248px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* The stage: a porcelain studio sweep with a gold top edge. */
+.hold-stage {
+  position: relative;
+  height: clamp(380px, 38vw, 540px);
+  border-radius: var(--r-hero);
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  background:
+    radial-gradient(60% 22% at 50% 92%, var(--hold-stage-floor), transparent 70%),
+    radial-gradient(120% 90% at 50% 18%, var(--hold-stage-a) 0%, var(--hold-stage-b) 78%);
+  box-shadow: var(--shadow-panel);
+  cursor: grab;
+}
+.hold-stage:active {
+  cursor: grabbing;
+}
+.hold-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  z-index: 3;
+  background: var(--gold-sheen);
+  pointer-events: none;
+}
+.hold-canvas {
+  position: absolute !important;
+  inset: 0;
+}
+.hold-stage__skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--paper) 70%, transparent) 50%, transparent 70%);
+  background-size: 220% 100%;
+  animation: hold-skel 1.6s linear infinite;
+}
+@keyframes hold-skel {
+  to {
+    background-position: -120% 0;
+  }
+}
+.hold-fallback {
+  position: absolute;
+  inset: auto 24px 24px;
+  margin: 0;
+  color: var(--ink-dim);
+}
+.hold-stage__chips {
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+}
+.hold-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid var(--hairline);
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+  color: var(--ink);
+}
+.hold-chip strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.hold-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.hold-dot--in {
+  background: var(--jade);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 60%, transparent);
+}
+.hold-dot--out {
+  background: transparent;
+  border: 1.5px solid var(--ink-dim);
+}
+.hold-stage__phase {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 18px;
+  margin: 0;
+  padding: 8px 16px;
+  max-width: calc(100% - 32px);
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid color-mix(in srgb, var(--gold) 70%, var(--hairline));
+  backdrop-filter: blur(8px);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--ink);
+  text-align: center;
+  pointer-events: none;
+  animation: hold-phase 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes hold-phase {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+    filter: blur(4px);
+  }
+}
+.hold-stage__skip {
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  right: 16px;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  font-size: 13px;
+  color: var(--ink-dim);
+  pointer-events: none;
+}
+.hold-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid color-mix(in srgb, var(--gold) 70%, var(--hairline));
+  font: 500 13px/1.4 var(--font-sans);
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.hold-tip {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-float);
+  font-size: 13px;
+  color: var(--ink);
+  pointer-events: none;
+}
+.hold-tip::before {
+  content: "";
+  position: absolute;
+  inset: 0 12px auto;
+  height: 1px;
+  background: var(--gold-sheen);
+}
+.hold-tip strong {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.hold-tip span {
+  color: var(--ink-dim);
+}
+.hold-tip em {
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ── Gauges ─────────────────────────────────────────────────────────────── */
+.hold-gauges {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: 20px 16px;
+  border-radius: var(--r-hero);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-panel);
+  position: relative;
+}
+.hold-gauges::before {
+  content: "";
+  position: absolute;
+  inset: 0 20px auto;
+  height: 1px;
+  background: var(--gold-sheen);
+}
+.hold-gauges__policy {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+.hold-gauges__policy strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.gauge {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+.gauge__dial {
+  position: relative;
+  width: 176px;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 6px 14px rgba(14, 43, 39, 0.1));
+}
+.gauge__dial svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.gauge__track {
+  stroke: var(--gauge-track);
+}
+.gauge__tick {
+  stroke: var(--gauge-tick);
+  opacity: 0.35;
+}
+.gauge__tick.is-lit {
+  opacity: 1;
+}
+.gauge__marker {
+  stroke: var(--paper);
+}
+.gauge__read {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 2px;
+}
+.gauge__read strong {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.gauge__read strong small {
+  font-size: 18px;
+  margin-left: 1px;
+}
+.gauge__read span {
+  font-size: 12px;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+.gauge figcaption {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: center;
+}
+
+/* ── Legend + honest caption ────────────────────────────────────────────── */
+.hold-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 14px 0 6px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+.hold-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hold-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+}
+.hold-swatch--express {
+  background: var(--hold-express);
+}
+.hold-swatch--priority {
+  background: var(--hold-priority);
+}
+.hold-swatch--general {
+  background: var(--hold-general);
+}
+.hold-swatch--strap {
+  background: linear-gradient(90deg, var(--mist) 0 40%, var(--gold) 40% 60%, var(--mist) 60%);
+}
+.hold-swatch--ghost {
+  background: transparent;
+  border: 1.5px solid var(--hold-spark);
+}
+.hold-caption {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-dim);
+  max-width: 78ch;
+}
+
+/* ── KPI tiles: separate foil cards with count-up numbers ──────────────── */
+.wow-protect .summary-grid.wow-kpis {
+  gap: 16px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.wow-protect .summary-grid.wow-kpis > div {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-panel);
+  background: var(--paper);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  --foil: linear-gradient(115deg, transparent 20%, color-mix(in srgb, var(--gold-pale) 70%, transparent) 45%, color-mix(in srgb, var(--celadon) 80%, transparent) 55%, transparent 80%);
+}
+.wow-protect .summary-grid.wow-kpis > div::after {
+  border-radius: inherit;
+}
+.wow-protect .summary-grid.wow-kpis strong {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+.wow-protect .summary-grid.wow-kpis strong.status-value {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--jade-ink, var(--jade));
+}
+.count-up {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .hold-hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hold-gauges {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hold-gauges__policy {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 640px) {
+  .hold-hero__title {
+    font-size: 28px;
+  }
+  .hold-hero__actions,
+  .hold-seg {
+    width: 100%;
+  }
+  .hold-seg button {
+    padding: 0 8px;
+    font-size: 13px;
+  }
+  .hold-stage {
+    height: 300px;
+    cursor: default;
+  }
+  .hold-stage__phase {
+    font-size: 16px;
+    bottom: 12px;
+  }
+  .wow-protect .wow-controls {
+    padding: 16px;
+  }
+  .wow-protect .wow-controls .button.primary {
+    margin-left: 0;
+    width: 100%;
+  }
+  .wow-protect .summary-grid.wow-kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 520px) {
+  .hold-gauges {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hold-stage__skip {
+    display: none;
+  }
+}
+
+html[data-fx="calm"] .hold-seg__thumb,
+html[data-fx="calm"] .hold-stage__phase,
+html[data-fx="calm"] .hold-stage__skeleton {
+  transition: none;
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hold-seg__thumb,
+  .hold-stage__phase,
+  .hold-stage__skeleton {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Readout must fit inside the ring at every width. */
+.gauge__read {
+  padding: 0 18%;
+}
+.gauge__read strong {
+  white-space: nowrap;
+  font-size: clamp(24px, 2.3vw, 34px);
+}
+.gauge__read strong small {
+  font-size: 0.5em;
+}
+.gauge__read span {
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.gauge__read strong {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px;
+}

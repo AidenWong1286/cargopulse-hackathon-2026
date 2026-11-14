@@ -1,0 +1,554 @@
+/* ════════════════════════════════════════════════════════════════════════
+   Wow moment: sign-in. A frosted jade-glass globe (components/fx/globe.tsx),
+   a cinematic intro (skippable by any click or key), a frosted glass card and
+   a gold dive into Hong Kong that the workspace arrival (chart/arrival.tsx)
+   opens from, like an iris. Decorative only; calm users see a still page.
+   ════════════════════════════════════════════════════════════════════════ */
+
+@property --iris {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+:root {
+  /* Globe glass (read by the WebGL scene; hex only) */
+  --globe-core: #f1f8f4;
+  --globe-deep: #b3d8cb;
+  --globe-rim: #00645a;
+  --globe-land: #ffffff;
+  --globe-line: #c9a655;
+  --globe-coast: #a8822f;
+  --globe-glow: #e3c985;
+  --globe-pin: #b8913f;
+  --globe-halo: #7cc4b2;
+  --globe-spec: #ffffff;
+  /* Where the globe sits on the page, as fractions of the stage */
+  --globe-cx: 0.45;
+  --globe-cy: 0.5;
+  --globe-fill-h: 0.68;
+  --globe-fill-w: 0.43;
+  --globe-d: min(calc(var(--globe-fill-h) * 100vh), calc(var(--globe-fill-w) * 100vw));
+
+  /* Gold light of the sign-in dive and the arrival iris */
+  --flare-core: #fffcf2;
+  --flare-gold: #f6e9be;
+  --flare-deep: #ead6a0;
+
+  /* Frosted card */
+  --login-card: color-mix(in srgb, var(--paper) 76%, transparent);
+  --login-card-inset: color-mix(in srgb, var(--paper) 52%, transparent);
+  --login-highlight: color-mix(in srgb, var(--paper) 70%, transparent);
+  --login-shadow: color-mix(in srgb, var(--pine) 26%, transparent);
+}
+html[data-theme="night"] {
+  --globe-core: #0f463d;
+  --globe-deep: #04201c;
+  --globe-rim: #63d3bb;
+  --globe-land: #2a7366;
+  --globe-line: #e3c985;
+  --globe-coast: #f3e2ae;
+  --globe-glow: #e3c985;
+  --globe-pin: #f6e9be;
+  --globe-halo: #2fa892;
+  --globe-spec: #f6e9be;
+  --flare-core: #fff3cf;
+  --flare-gold: #d9b45e;
+  --flare-deep: #0f2c27;
+  --login-card: color-mix(in srgb, var(--paper) 80%, transparent);
+  --login-card-inset: color-mix(in srgb, var(--porcelain) 55%, transparent);
+  --login-highlight: color-mix(in srgb, var(--gold) 22%, transparent);
+  --login-shadow: color-mix(in srgb, var(--porcelain) 70%, transparent);
+}
+
+/* ── Stage ──────────────────────────────────────────────────────────────── */
+.login-globe {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.login-globe .globe-canvas {
+  pointer-events: auto;
+  touch-action: pan-y;
+  animation: globe-emerge 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.login-globe canvas {
+  cursor: grab;
+}
+.login-globe canvas[data-dragging] {
+  cursor: grabbing;
+}
+@keyframes globe-emerge {
+  from {
+    filter: blur(16px) brightness(1.35) saturate(1.2);
+  }
+  to {
+    filter: none;
+  }
+}
+/* While the 3D globe loads (or without WebGL): the soft light it emerges from. */
+.globe-placeholder {
+  position: absolute;
+  left: calc(var(--globe-cx) * 100%);
+  top: calc(var(--globe-cy) * 100%);
+  width: var(--globe-d);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 32%,
+    color-mix(in srgb, var(--globe-core) 70%, transparent) 0%,
+    color-mix(in srgb, var(--globe-deep) 45%, transparent) 55%,
+    color-mix(in srgb, var(--globe-glow) 18%, transparent) 72%,
+    transparent 74%
+  );
+  box-shadow: 0 0 120px 20px color-mix(in srgb, var(--globe-glow) 22%, transparent);
+  opacity: 0.6;
+}
+
+/* Text sits on the left over the glass: a soft porcelain wash and halo keep it AA. */
+.login::after {
+  width: 50%;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--porcelain) 80%, transparent) 0%,
+    color-mix(in srgb, var(--porcelain) 52%, transparent) 38%,
+    transparent 100%
+  );
+}
+.login-story {
+  pointer-events: none;
+  animation: none;
+}
+.login-hero :is(h1, p),
+.login-story .brand {
+  text-shadow:
+    0 0 2px var(--porcelain),
+    0 0 18px var(--porcelain),
+    0 0 36px color-mix(in srgb, var(--porcelain) 70%, transparent);
+}
+
+/* ── Headline and story intro ───────────────────────────────────────────── */
+.login-hero .login-title {
+  white-space: normal;
+  animation: login-rule 0.9s var(--ease) 1.5s both;
+}
+.login-title-line {
+  display: block;
+}
+@keyframes login-rule {
+  from {
+    background-size: 0 1px;
+  }
+}
+.login-story .brand {
+  animation: login-fade-up 0.8s var(--ease) 0.25s both;
+}
+.login-hero > p {
+  animation: login-fade-up 0.9s var(--ease) 1.25s both;
+}
+.login-boundary {
+  animation: login-fade-up 0.9s var(--ease) 1.45s both;
+}
+.login-chart-note {
+  z-index: 1;
+  animation: login-fade 0.8s linear 2.3s both;
+}
+@keyframes login-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+}
+@keyframes login-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ── The frosted glass card ─────────────────────────────────────────────── */
+.login .login-form {
+  z-index: 2;
+  border: 0;
+  background: var(--login-card);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+  backdrop-filter: blur(22px) saturate(1.35);
+  box-shadow:
+    inset 0 1px 0 var(--login-highlight),
+    0 40px 90px -30px var(--login-shadow),
+    var(--shadow-float);
+  transform-origin: 100% 50%;
+  animation: login-card-in 1s cubic-bezier(0.16, 1, 0.3, 1) 1.55s both;
+}
+@keyframes login-card-in {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) translateX(56px) rotateY(-9deg) scale(0.97);
+    filter: blur(10px);
+  }
+}
+/* Thin gold edge, with one slow glint running around it after arrival. */
+.login-card-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 42%, var(--flare-core) 50%, transparent 58%) 220% 0 / 260% 100% no-repeat,
+    var(--gold-sheen);
+  -webkit-mask:
+    linear-gradient(var(--mask-on) 0 0) content-box,
+    linear-gradient(var(--mask-on) 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: login-edge-glint 1.6s cubic-bezier(0.5, 0, 0.2, 1) 2.45s both;
+}
+@keyframes login-edge-glint {
+  to {
+    background-position:
+      -60% 0,
+      0 0;
+  }
+}
+.login-form > :not(.login-card-edge) {
+  position: relative;
+  z-index: 1;
+}
+.login .dev-login {
+  border: 1px solid color-mix(in srgb, var(--hairline) 80%, transparent);
+  background: var(--login-card-inset);
+}
+.login .dev-login label {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.login .dev-login select {
+  min-height: 48px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background-color: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--login-highlight);
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+.login .dev-login select:hover {
+  border-color: var(--jade-ink);
+}
+.login .dev-login select:focus-visible {
+  outline: 2px solid var(--jade-ink);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--gold) 38%, transparent);
+}
+
+/* The primary action: jade, a fine gold edge and a light that passes on hover. */
+.login .login-enter {
+  position: relative;
+  overflow: hidden;
+  min-height: 50px;
+  margin-top: 16px;
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--jade-fill));
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gold-pale) 55%, transparent),
+    0 12px 28px -12px color-mix(in srgb, var(--jade) 80%, transparent);
+  transition:
+    transform 0.25s var(--ease),
+    box-shadow 0.3s var(--ease),
+    background 0.2s var(--ease);
+}
+.login .login-enter::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in srgb, var(--gold-pale) 50%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.5, 0, 0.2, 1);
+  pointer-events: none;
+}
+.login .login-enter:hover:not(:disabled)::after {
+  transform: translateX(120%);
+}
+.login .login-enter:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gold-pale) 65%, transparent),
+    0 16px 34px -12px color-mix(in srgb, var(--jade) 85%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--gold) 28%, transparent);
+}
+.login .login-enter:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+.login .login-enter:disabled {
+  cursor: progress;
+}
+.login .login-sso {
+  background-color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+/* ── Sign-in dive: gold light flares from Hong Kong ─────────────────────── */
+.login-flare {
+  position: absolute;
+  left: calc(var(--globe-cx) * 100%);
+  top: calc(var(--globe-cy) * 100%);
+  width: 26vmax;
+  height: 26vmax;
+  margin: -13vmax 0 0 -13vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--flare-core) 0%,
+    var(--flare-gold) 24%,
+    color-mix(in srgb, var(--flare-deep) 60%, transparent) 48%,
+    transparent 70%
+  );
+  opacity: 0;
+  transform: scale(0.12);
+  pointer-events: none;
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.8s var(--ease);
+}
+.login-flare-rays {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--flare-gold) 75%, transparent) 0deg 0.8deg,
+    transparent 0.8deg 7.5deg
+  );
+  -webkit-mask: radial-gradient(circle, var(--mask-on) 6%, transparent 60%);
+  mask: radial-gradient(circle, var(--mask-on) 6%, transparent 60%);
+  opacity: 0.6;
+}
+.login[data-diving] .login-flare {
+  animation: login-flare 1.15s cubic-bezier(0.55, 0, 0.2, 1) 0.1s forwards;
+}
+.login[data-diving] .login-flare-rays {
+  animation: login-rays 1.4s linear forwards;
+}
+@keyframes login-flare {
+  0% {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  45% {
+    opacity: 0.85;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(9);
+  }
+}
+@keyframes login-rays {
+  to {
+    transform: rotate(36deg);
+  }
+}
+.login[data-diving]:not([data-leaving]) .login-story {
+  transition: opacity 0.6s var(--ease);
+  opacity: 0.72;
+}
+
+/* ── Skipped intro (any click / key) and calm: everything simply appears ── */
+.login[data-intro="skip"] :is(
+    .globe-canvas,
+    .login-title,
+    .login-story .brand,
+    .login-hero > p,
+    .login-boundary,
+    .login-chart-note,
+    .login-card-edge,
+    .shimmer-ch
+  ),
+.login[data-intro="skip"]:not([data-leaving]) .login-form {
+  animation: none;
+}
+/* Signed in: the card and note leave (as animations, since they hold their intro state). */
+.login[data-leaving][data-intro] :is(.login-form, .login-chart-note) {
+  animation: login-leave 0.26s var(--ease) forwards;
+}
+@keyframes login-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+html[data-fx="lite"] .login .login-form {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+html[data-fx="calm"] .login-flare {
+  display: none;
+}
+
+/* ── Arrival in the workspace: the gold light opens like an iris ────────── */
+.arrival-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 42%,
+    var(--flare-core) 0%,
+    var(--flare-gold) 32%,
+    var(--flare-deep) 92%
+  );
+  animation: login-fade 0.25s linear both;
+}
+.arrival-iris-host {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  animation: iris-open 1s cubic-bezier(0.6, 0, 0.25, 1) both;
+}
+@keyframes iris-open {
+  from {
+    --iris: 0px;
+  }
+  to {
+    --iris: calc(var(--iris-r) + 14vmax);
+  }
+}
+.arrival-iris {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--iris-x) var(--iris-y),
+    var(--flare-core) 0%,
+    var(--flare-gold) 30%,
+    var(--flare-deep) 88%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at var(--iris-x) var(--iris-y),
+    transparent var(--iris),
+    var(--mask-on) calc(var(--iris) + 12vmax)
+  );
+  mask-image: radial-gradient(
+    circle at var(--iris-x) var(--iris-y),
+    transparent var(--iris),
+    var(--mask-on) calc(var(--iris) + 12vmax)
+  );
+  animation: iris-fade 1s linear both;
+}
+.arrival-iris-ring {
+  position: absolute;
+  left: var(--iris-x);
+  top: var(--iris-y);
+  width: calc(var(--iris) * 2 + 3vmax);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--gold) 85%, transparent),
+    0 0 44px 8px color-mix(in srgb, var(--gold-pale) 55%, transparent),
+    inset 0 0 44px 8px color-mix(in srgb, var(--gold) 35%, transparent);
+  animation: iris-fade 1s ease both;
+}
+@keyframes iris-fade {
+  0%,
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+html[data-fx="lite"] .arrival-iris-ring {
+  display: none;
+}
+
+/* ── Narrow screens: globe on top, words and card below ─────────────────── */
+@media (max-width: 900px) {
+  :root {
+    --globe-cx: 0.5;
+    --globe-cy: 0.27;
+    --globe-fill-h: 0.4;
+    --globe-fill-w: 0.8;
+    --globe-d: min(calc(var(--globe-fill-h) * 100svh), calc(var(--globe-fill-w) * 100vw));
+  }
+  .login-globe {
+    position: absolute;
+    height: 100svh;
+  }
+  .login::after {
+    width: 100%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 34%,
+      color-mix(in srgb, var(--porcelain) 62%, transparent) 58%,
+      color-mix(in srgb, var(--porcelain) 82%, transparent) 100%
+    );
+  }
+  .login-story {
+    justify-content: flex-start;
+    gap: 0;
+  }
+  .login-hero {
+    margin-top: calc(var(--globe-cy) * 100svh + var(--globe-d) / 2 - 64px);
+  }
+  .login .login-form {
+    transform-origin: 50% 0;
+  }
+  @keyframes login-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+      filter: blur(10px);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-flare,
+  .arrival-light,
+  .arrival-iris-host {
+    display: none;
+  }
+  .login-globe .globe-canvas,
+  .login .login-form,
+  .login-card-edge,
+  .login-title,
+  .login-story .brand,
+  .login-hero > p,
+  .login-boundary,
+  .login-chart-note {
+    animation: none !important;
+  }
+}
+
+/* Display toggles + language in the sign-in card's top-right corner. */
+.login-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.login-tools .fx-controls {
+  background: transparent;
+  backdrop-filter: none;
+}

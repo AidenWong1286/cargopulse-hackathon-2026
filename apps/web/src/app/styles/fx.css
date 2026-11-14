@@ -1,0 +1,432 @@
+/* ════════════════════════════════════════════════════════════════════════
+   FX layer: living background, night theme, sunset sweep, page transitions,
+   holographic foil, shimmer titles. Decorative only. Calm under reduced motion
+   (html[data-fx="calm"]) and lighter in performance mode (html[data-fx="lite"]).
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --jade-ink: var(--jade); /* jade used as text (links, values) */
+  --glass: color-mix(in srgb, var(--paper) 72%, transparent);
+  --glass-edge: color-mix(in srgb, var(--paper) 60%, var(--gold) 40%);
+  --foil: conic-gradient(
+    from 210deg at var(--mx, 50%) var(--my, 50%),
+    #f6e9be00 0deg,
+    #f6e9be 40deg,
+    #9fe3d2 95deg,
+    #e3c985 150deg,
+    #c9e7ff 210deg,
+    #f3e2ae 270deg,
+    #f6e9be00 330deg
+  );
+}
+
+/* ── Night: deep jade lounge after dark ─────────────────────────────────── */
+html[data-theme="night"] {
+  color-scheme: dark;
+  --porcelain: #0a1c19;
+  --paper: #102622;
+  --mist: #17332e;
+  --well: #0d211e;
+  --hairline: #23443d;
+  --hairline-strong: #31574f;
+  --line-strong: #6f8d86;
+  --celadon: #163b34;
+  --ink: #e8f1ed;
+  --ink-dim: #a8bdb6;
+  --jade: #00796c;
+  --jade-fill: #00796c;
+  --jade-fill-hover: #008a7b;
+  --jade-ink: #7fdcc8;
+  --route: #6fd3be;
+  --gold-deep: #e3c985;
+  --chart-sea: #0f2c27;
+  --chart-land: #163731;
+  --chart-line: color-mix(in srgb, #7fdcc8 14%, #0f2c27);
+  --chart-coast: color-mix(in srgb, #7fdcc8 34%, #163731);
+  --chart-shallows: color-mix(in srgb, #163731 55%, #0f2c27);
+  --chart-dot: color-mix(in srgb, #7fdcc8 22%, #163731);
+  --chart-ink: #c4d6cf;
+  --chart-halo: color-mix(in srgb, #0f2c27 80%, transparent);
+  --pass: #45c08a;
+  --pass-ink: #8fe0b9;
+  --pass-tint: #133a2b;
+  --verify: #e0aa48;
+  --verify-ink: #f2cd85;
+  --verify-tint: #3a2f15;
+  --block: #e46d63;
+  --block-ink: #f5a29a;
+  --block-tint: #401f1c;
+  --unknown: #94a7a1;
+  --unknown-ink: #c0cecb;
+  --unknown-tint: #1c322d;
+  --indigo-ink: #b3bbf5;
+  --indigo-tint: #1f2546;
+  --amber: #e4a93f;
+  --viz-policy-earliest: #9aa2ec;
+  --viz-policy-priority: #d9a234;
+  --viz-policy-optimiser: #3fbfa6;
+  --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.28);
+  --shadow-float: 0 2px 8px rgba(0, 0, 0, 0.35), 0 18px 44px rgba(0, 0, 0, 0.4);
+  --glass: color-mix(in srgb, var(--paper) 78%, transparent);
+}
+html[data-theme="night"] body {
+  background: var(--porcelain);
+  color: var(--ink);
+}
+html[data-theme="night"] .living-land {
+  fill: #18403a;
+  fill-opacity: 0.55;
+}
+html[data-theme="night"] .living-graticule {
+  stroke: #e3c985;
+  opacity: 0.18;
+}
+html[data-theme="night"] .living-night {
+  fill: #000;
+}
+/* Night keeps the departure board and verdict as the jewels: give them a gold edge. */
+html[data-theme="night"] :is(.board, .verdict, .departure-board) {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 35%, transparent), var(--shadow-float);
+}
+
+/* ── Living background layers ───────────────────────────────────────────── */
+.living-backdrop {
+  background: var(--porcelain);
+}
+.living-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  animation: sky-in 1.6s var(--ease) both;
+}
+.living-backdrop svg {
+  position: relative;
+}
+.living-turn {
+  animation: graticule-turn 480s linear infinite;
+}
+.living-ring-far {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1;
+  opacity: 0.32;
+  stroke-dasharray: 2 7;
+  vector-effect: non-scaling-stroke;
+}
+@keyframes graticule-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes sky-in {
+  from {
+    opacity: 0;
+  }
+}
+html[data-fx="calm"] .living-turn {
+  animation: none;
+}
+
+/* ── Display toggles ────────────────────────────────────────────────────── */
+.fx-controls {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+}
+.fx-toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.fx-toggle:hover {
+  background: var(--mist);
+  color: var(--ink);
+}
+.fx-toggle[aria-pressed="true"] {
+  color: var(--jade-ink);
+  background: color-mix(in srgb, var(--gold) 22%, transparent);
+}
+.fx-toggle:active {
+  transform: scale(0.92);
+}
+.fx-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.fx-toggle:focus-visible {
+  outline: 2px solid var(--jade-ink);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Sunset / sunrise sweep (View Transitions) ──────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-sweep]::view-transition-new(root) {
+  animation: sweep-open 1.5s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+html[data-sweep]::view-transition-old(root) {
+  animation: sweep-dim 1.5s ease both;
+}
+html[data-sweep="sunset"]::view-transition-group(root) {
+  background: radial-gradient(
+    circle at var(--sweep-x) var(--sweep-y),
+    #f6e9be 0%,
+    #e9b764 18%,
+    #d0794b 34%,
+    #6b3b52 52%,
+    #0a1c19 75%
+  );
+}
+html[data-sweep="sunrise"]::view-transition-group(root) {
+  background: radial-gradient(
+    circle at var(--sweep-x) var(--sweep-y),
+    #ffffff 0%,
+    #f6e9be 20%,
+    #f2c78a 38%,
+    #9fd3c5 58%,
+    #f6f8f5 80%
+  );
+}
+@keyframes sweep-open {
+  0% {
+    clip-path: circle(0 at var(--sweep-x) var(--sweep-y));
+    filter: saturate(1.4) brightness(1.15);
+  }
+  100% {
+    clip-path: circle(150vmax at var(--sweep-x) var(--sweep-y));
+    filter: none;
+  }
+}
+@keyframes sweep-dim {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.55;
+    filter: sepia(0.5) saturate(1.3);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── Page transition ────────────────────────────────────────────────────── */
+.pt-host {
+  position: relative;
+}
+.pt-sweep {
+  position: fixed;
+  inset: 0 0 0 auto;
+  left: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    transparent 35%,
+    color-mix(in srgb, var(--gold-pale) 70%, transparent) 45%,
+    color-mix(in srgb, var(--gold) 55%, transparent) 50%,
+    color-mix(in srgb, var(--jade) 18%, transparent) 56%,
+    transparent 66%
+  );
+  background-size: 260% 100%;
+  mix-blend-mode: soft-light;
+  animation: pt-sweep 1.1s cubic-bezier(0.5, 0, 0.2, 1) both;
+}
+html[data-theme="night"] .pt-sweep {
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+@keyframes pt-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+/* ── Holographic foil sheen: add data-foil to a card ────────────────────── */
+[data-foil] {
+  position: relative;
+  isolation: isolate;
+  transition: transform 0.5s var(--ease);
+  transform: perspective(900px) rotateX(calc(var(--tilt-x, 0deg) * var(--foil-on, 0)))
+    rotateY(calc(var(--tilt-y, 0deg) * var(--foil-on, 0)));
+}
+[data-foil]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, #fff 55%, transparent) 0%,
+      transparent 38%
+    ),
+    var(--foil);
+  mix-blend-mode: soft-light;
+  opacity: calc(var(--foil-on, 0) * 0.85);
+  transition: opacity 0.4s var(--ease);
+  z-index: 2;
+}
+/* A thin gold edge that lights up toward the pointer. */
+[data-foil]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    #f6e9be,
+    #c9a655 40%,
+    transparent 70%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: calc(var(--foil-on, 0));
+  transition: opacity 0.4s var(--ease);
+  z-index: 3;
+}
+html[data-fx="calm"] [data-foil] {
+  transform: none;
+}
+html[data-fx="calm"] [data-foil]::after,
+html[data-fx="calm"] [data-foil]::before {
+  display: none;
+}
+
+/* ── Shimmer titles ─────────────────────────────────────────────────────── */
+.shimmer-title .shimmer-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.shimmer-ch {
+  display: inline-block;
+  animation:
+    st-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both,
+    st-glint 0.9s ease-in-out both;
+  animation-delay:
+    calc(var(--st-d, 0ms) + var(--i) * var(--st-step, 24ms)),
+    calc(var(--st-d, 0ms) + var(--st-n) * var(--st-step, 24ms) + 250ms + var(--i) * 26ms);
+}
+@keyframes st-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em) rotateX(55deg);
+    filter: blur(5px);
+  }
+}
+@keyframes st-glint {
+  0%,
+  100% {
+    color: inherit;
+    text-shadow: none;
+  }
+  45% {
+    color: var(--gold-deep);
+    text-shadow:
+      0 0 12px color-mix(in srgb, var(--gold) 70%, transparent),
+      0 0 1px var(--gold-deep);
+  }
+}
+html[data-fx="calm"] .shimmer-ch {
+  animation: none;
+}
+html[data-fx="lite"] .shimmer-ch {
+  animation-name: st-in-lite, st-glint;
+}
+@keyframes st-in-lite {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ── Glass panels: frosted depth on overlays and floating cards ─────────── */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.25);
+  border: 1px solid color-mix(in srgb, var(--paper) 50%, var(--hairline));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 60%, transparent),
+    var(--shadow-float);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-sky,
+  .living-turn,
+  .pt-sweep,
+  .shimmer-ch {
+    animation: none !important;
+  }
+}
+
+/* Small screens: the top bar wraps instead of overflowing; presenting is a desktop feature. */
+@media (max-width: 760px) {
+  .topbar {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    height: auto;
+  }
+  .topbar .present-button {
+    display: none;
+  }
+  .topbar .hub-clock {
+    display: none;
+  }
+}
+
+/* Top bar: the demo sentence stays on one line (trimmed with "…" when space is
+   short) and never squeezes the SYNTHETIC tag into the clock. */
+.topbar .demo-line {
+  flex: 1 1 auto;
+  min-width: auto;
+}
+.topbar .demo-note {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+@media (max-width: 1280px) {
+  .topbar .demo-note {
+    display: none;
+  }
+}

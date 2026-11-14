@@ -1,0 +1,656 @@
+/* ════════════════════════════════════════════════════════════════════════
+   Wow moments: the demo fly-in (start-demo + fx/container-flight) and the solve
+   swarm (scenario + fx/solve-swarm). Decorative motion only; html[data-fx="calm"]
+   shows final states, html[data-fx="lite"] trims the extras.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Dark pine text for gold surfaces: AA on --gold-sheen in day and night. */
+  --wow-on-gold: #10302a;
+  --wow-gold-glow: color-mix(in srgb, var(--gold) 45%, transparent);
+  --wow-gold-faint: color-mix(in srgb, var(--gold) 22%, transparent);
+  --wow-gold-line: color-mix(in srgb, var(--gold-deep) 55%, var(--hairline));
+  --wow-white-glint: color-mix(in srgb, #fff 62%, transparent);
+  --wow-stage-glow: color-mix(in srgb, var(--gold-pale) 30%, transparent);
+}
+html[data-theme="night"] {
+  --wow-stage-glow: color-mix(in srgb, var(--gold) 12%, transparent);
+  --wow-white-glint: color-mix(in srgb, #fff 38%, transparent);
+}
+
+/* ── Departure board: foil sheen + fly-in landing target ─────────────────── */
+/* The board's own gold top edge moves into its background so the foil can use
+   both pseudo-elements; its one-time entrance sheen moves to the header. */
+.board[data-foil] {
+  background:
+    var(--gold-sheen) top / 100% 2px no-repeat,
+    var(--board-surface);
+}
+.board[data-foil]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), var(--wow-white-glint) 0%, transparent 38%),
+    var(--foil);
+  mix-blend-mode: soft-light;
+  opacity: calc(var(--foil-on, 0) * 0.85);
+  transform: none;
+  animation: none;
+  transition: opacity 0.4s var(--ease);
+  z-index: 2;
+}
+.board[data-foil]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: auto;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), var(--gold-pale), var(--gold-deep) 40%, transparent 70%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: var(--foil-on, 0);
+  transition: opacity 0.4s var(--ease);
+  z-index: 3;
+}
+.board[data-foil] .board-head::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--board-sheen);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-110%);
+  animation: board-sheen 1.3s var(--ease) 0.55s 1;
+}
+.board[data-landing] {
+  animation: wow-board-pulse 1s ease-in-out infinite;
+}
+.board[data-landed] {
+  animation: wow-board-landed 1.2s var(--ease) 1 both;
+}
+@keyframes wow-board-pulse {
+  0%,
+  100% {
+    box-shadow:
+      var(--shadow-float),
+      0 0 0 1px var(--wow-gold-glow),
+      0 0 18px 0 var(--wow-gold-faint);
+  }
+  50% {
+    box-shadow:
+      var(--shadow-float),
+      0 0 0 2px var(--gold),
+      0 0 48px 8px var(--wow-gold-glow);
+  }
+}
+@keyframes wow-board-landed {
+  0% {
+    box-shadow:
+      var(--shadow-float),
+      0 0 0 3px var(--gold-pale),
+      0 0 90px 22px var(--wow-gold-glow);
+  }
+  100% {
+    box-shadow:
+      var(--shadow-float),
+      0 0 0 1px var(--wow-gold-glow),
+      0 0 30px 4px var(--wow-gold-faint);
+  }
+}
+
+/* ── Start demo: gold step chips, real count, fly-in canvas ─────────────── */
+.wow-steps-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 28px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+}
+.wow-steps-row .start-steps {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.start-steps.wow-steps li[data-state="done"] .start-step-mark {
+  border-color: var(--gold-deep);
+  background: var(--gold-sheen);
+  color: var(--wow-on-gold);
+  box-shadow:
+    0 0 0 3px var(--wow-gold-faint),
+    0 0 14px var(--wow-gold-glow);
+  animation: wow-chip-light 0.65s var(--ease) both;
+}
+.start-steps.wow-steps li[data-state="current"] .start-step-mark {
+  border-color: var(--gold-deep);
+}
+.start-steps.wow-steps li[data-state="current"] .start-step-mark::after {
+  background: var(--gold-deep);
+  box-shadow: 0 0 10px var(--wow-gold-glow);
+}
+@keyframes wow-chip-light {
+  0% {
+    transform: scale(0.6);
+    filter: brightness(1.7);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+  }
+}
+.start-card .wow-count {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-dim);
+  animation: wow-fade-up 0.5s var(--ease) both;
+}
+.wow-count b {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  background: var(--gold-sheen) left bottom / 100% 2px no-repeat;
+  padding-bottom: 1px;
+}
+.start-card .wow-skip {
+  margin: 0 0 0 auto;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.start-card[data-wow="ready"] {
+  border-color: var(--wow-gold-line);
+  box-shadow:
+    var(--shadow-panel),
+    0 0 0 1px var(--wow-gold-faint),
+    0 0 36px var(--wow-gold-faint);
+  transition: box-shadow 0.4s var(--ease);
+}
+.flight-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 80;
+}
+@keyframes wow-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ── Solve swarm stage ──────────────────────────────────────────────────── */
+.swarm {
+  position: relative;
+  margin: 0 0 24px;
+  padding: 20px 24px 16px;
+  overflow: hidden;
+  border-radius: var(--r-hero);
+  animation: swarm-in 0.7s var(--ease) both;
+}
+.swarm.glass {
+  border-color: var(--wow-gold-line);
+  background:
+    radial-gradient(110% 90% at 50% 58%, var(--wow-stage-glow), transparent 62%),
+    var(--glass);
+}
+/* A light-gold edge that brightens at the corners. */
+.swarm::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    var(--gold-pale),
+    var(--gold-deep) 22%,
+    transparent 42%,
+    transparent 62%,
+    var(--gold-deep) 86%,
+    var(--gold-pale)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.85;
+}
+@keyframes swarm-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+}
+.swarm[data-phase="fading"] {
+  animation: swarm-out 0.9s var(--ease) both;
+}
+@keyframes swarm-out {
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+.swarm-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 10px;
+}
+.swarm-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.swarm-kicker::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gold-sheen);
+}
+.swarm-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+}
+:lang(zh-Hant) .swarm-title {
+  font-size: 26px;
+  font-weight: 500;
+}
+.swarm[data-compact] .swarm-title {
+  font-size: 22px;
+}
+.swarm[data-compact] {
+  padding: 14px 20px 12px;
+}
+
+.swarm-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.swarm-steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  font-size: 13px;
+  color: var(--ink-dim);
+  transition:
+    background 0.4s var(--ease),
+    color 0.4s var(--ease),
+    border-color 0.4s var(--ease);
+}
+.swarm-step-mark {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--hairline-strong);
+  border-radius: 50%;
+}
+.swarm-steps li[data-state="current"] {
+  border-color: var(--gold-deep);
+  color: var(--ink);
+  font-weight: 600;
+}
+.swarm-steps li[data-state="current"] .swarm-step-mark {
+  border-color: var(--gold-deep);
+}
+.swarm-steps li[data-state="current"] .swarm-step-mark::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-deep);
+  box-shadow: 0 0 10px var(--wow-gold-glow);
+  animation: start-beat 0.9s var(--ease) infinite alternate;
+}
+.swarm-steps li[data-state="done"] {
+  border-color: var(--gold-deep);
+  background: var(--gold-sheen);
+  color: var(--wow-on-gold);
+}
+.swarm-steps li[data-state="done"] .swarm-step-mark {
+  border-color: var(--wow-on-gold);
+  color: var(--wow-on-gold);
+  animation: wow-chip-light 0.65s var(--ease) both;
+}
+
+.swarm-body {
+  position: relative;
+  min-height: 96px;
+  transition: height 0.9s var(--ease);
+}
+.swarm-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.swarm-lanes {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 1;
+  animation: wow-fade-up 0.6s var(--ease) both;
+}
+.swarm-lane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  border-top: 1px dashed color-mix(in srgb, var(--hairline) 80%, transparent);
+}
+.swarm-lane:first-child {
+  border-top-color: transparent;
+}
+.swarm-lane-label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: baseline;
+  column-gap: 10px;
+  width: var(--label-w);
+  height: 100%;
+  align-content: center;
+  padding-right: 12px;
+  border-right: 1px solid var(--wow-gold-line);
+  font-size: 13px;
+  color: var(--ink);
+}
+.swarm-lane-label strong {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.swarm-flight {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+.swarm-route {
+  grid-column: 1;
+  grid-row: 2;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.swarm-count {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--jade-ink);
+  font-variant-numeric: tabular-nums;
+}
+.swarm-lane[data-kind="person"] strong,
+.swarm-lane[data-kind="person"] .swarm-count {
+  color: var(--verify-ink);
+}
+.swarm-lane[data-kind="other"] strong,
+.swarm-lane[data-kind="missing"] strong {
+  font-weight: 500;
+  color: var(--ink-dim);
+}
+.swarm-onward {
+  position: absolute;
+  right: 12px;
+  bottom: 3px;
+  font-size: 11px;
+  color: var(--ink-dim);
+  z-index: 3;
+}
+.swarm[data-compact] .swarm-count {
+  font-size: 17px;
+}
+.swarm[data-compact] .swarm-route {
+  display: none;
+}
+.swarm[data-compact] .swarm-lane-label {
+  grid-template-rows: auto;
+}
+.swarm[data-compact] .swarm-flight + .swarm-route {
+  display: none;
+}
+.swarm-skip {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+  z-index: 3;
+  animation: wow-fade-up 0.6s var(--ease) 1.2s both;
+}
+
+.swarm-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--wow-gold-line);
+}
+.swarm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.swarm-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.swarm-legend b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.swarm-swatch {
+  width: 10px;
+  height: 9px;
+  border-radius: 2px 2px 2px 0;
+  background: var(--swatch);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%, 0 66%);
+}
+.swarm-summary {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+  animation: wow-fade-up 0.6s var(--ease) both;
+}
+.swarm-summary b {
+  font-weight: 400;
+  color: var(--jade-ink);
+  background: var(--gold-sheen) left bottom / 100% 2px no-repeat;
+}
+.swarm-summary-people {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--verify-ink);
+}
+
+/* ── Solve side panel: frosted jade glass with a gold edge ───────────────── */
+.decision-rail.wow-rail {
+  border-color: var(--wow-gold-line);
+  background:
+    var(--gold-sheen) top / 100% 2px no-repeat,
+    radial-gradient(120% 60% at 100% 0%, var(--wow-stage-glow), transparent 60%),
+    var(--glass);
+  backdrop-filter: blur(14px) saturate(1.25);
+  box-shadow:
+    inset 0 1px 0 var(--wow-white-glint),
+    var(--shadow-float);
+}
+.decision-rail.wow-rail h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+.decision-rail.wow-rail .button.primary {
+  box-shadow:
+    0 0 0 1px var(--wow-gold-faint),
+    0 6px 18px var(--wow-gold-faint);
+}
+/* Breathes gold only while a real solve job is active. */
+.decision-rail.wow-rail[data-solving] {
+  animation: wow-rail-solving 2.4s ease-in-out infinite;
+}
+@keyframes wow-rail-solving {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 var(--wow-white-glint),
+      var(--shadow-float),
+      0 0 0 1px var(--wow-gold-faint);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 var(--wow-white-glint),
+      var(--shadow-float),
+      0 0 0 2px var(--wow-gold-glow),
+      0 0 32px var(--wow-gold-faint);
+  }
+}
+.decision-rail.wow-rail .job {
+  border-top-color: var(--wow-gold-line);
+}
+
+/* "Review proposal" after the moment: the obvious next step. */
+.button.wow-cta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-color: var(--gold-deep);
+  background: var(--gold-sheen);
+  color: var(--wow-on-gold);
+  font-weight: 600;
+  animation: wow-cta-glow 2.2s ease-in-out 0.2s 3 both;
+}
+.button.wow-cta:hover {
+  color: var(--wow-on-gold);
+  filter: brightness(1.05);
+}
+.wow-cta-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, var(--wow-white-glint) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: wow-cta-sheen 2.2s var(--ease) 0.2s 3;
+}
+@keyframes wow-cta-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--wow-gold-faint);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px var(--wow-gold-glow),
+      0 0 28px 4px var(--wow-gold-glow);
+  }
+}
+@keyframes wow-cta-sheen {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+/* ── Effect levels ──────────────────────────────────────────────────────── */
+html[data-fx="lite"] .swarm,
+html[data-fx="lite"] .decision-rail.wow-rail {
+  backdrop-filter: none;
+}
+html[data-fx="lite"] .decision-rail.wow-rail[data-solving] {
+  animation: none;
+}
+html[data-fx="calm"] .board[data-foil] .board-head::after,
+html[data-fx="calm"] .wow-cta-sheen {
+  display: none;
+}
+html[data-fx="calm"] .board[data-landing],
+html[data-fx="calm"] .board[data-landed],
+html[data-fx="calm"] .swarm,
+html[data-fx="calm"] .swarm-lanes,
+html[data-fx="calm"] .swarm-summary,
+html[data-fx="calm"] .swarm-steps li[data-state] .swarm-step-mark,
+html[data-fx="calm"] .swarm-steps li[data-state] .swarm-step-mark::after,
+html[data-fx="calm"] .start-steps.wow-steps li .start-step-mark,
+html[data-fx="calm"] .start-card .wow-count,
+html[data-fx="calm"] .decision-rail.wow-rail[data-solving],
+html[data-fx="calm"] .button.wow-cta {
+  animation: none;
+}
+html[data-fx="calm"] .swarm-body {
+  transition: none;
+}
+html[data-fx="calm"] .swarm[data-phase="fading"] {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .swarm {
+    padding: 16px 14px 12px;
+  }
+  .swarm-title {
+    font-size: 26px;
+  }
+  .swarm-count {
+    font-size: 18px;
+  }
+  .swarm-route {
+    display: none;
+  }
+}

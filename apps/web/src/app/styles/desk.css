@@ -1,0 +1,543 @@
+/* desk styles. Loaded after globals.css; unlayered, so these rules win over @layer components. Tokens only, no raw colours. */
+:root {
+  /* Departure board: text and light on the one Deep Pine surface */
+  --board-surface: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pine) 90%, var(--jade)) 0%,
+    var(--pine) 62%
+  );
+  --board-ink: var(--flap-digit);
+  --board-dim: color-mix(in srgb, var(--flap-digit) 72%, var(--pine)); /* 7:1 on pine */
+  --board-sheen: linear-gradient(
+    105deg,
+    transparent 38%,
+    color-mix(in srgb, var(--gold-pale) 20%, transparent) 50%,
+    transparent 62%
+  );
+  --row-lift: color-mix(in srgb, var(--celadon) 32%, var(--paper));
+  --preview-surface: color-mix(in srgb, var(--celadon) 20%, var(--paper));
+  --slider-thumb: 22px;
+}
+
+/* ── Shared load stagger: set --i to the element's place in the sequence ── */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.rise {
+  /* "backwards" only: once landed, the element keeps its own transform (hover lift). */
+  animation: rise-in 420ms var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ── Hero band: hub chart (62%) beside the departure board (38%) ── */
+.desk-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 62fr) minmax(0, 38fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.desk-chart {
+  min-width: 0;
+  border-radius: var(--r-hero);
+}
+.desk-chart .hub-chart[data-variant="band"] {
+  height: 100%;
+}
+
+/* ── Departure board ── */
+.board {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px 28px 14px;
+  overflow: hidden;
+  border-radius: var(--r-hero);
+  background: var(--board-surface);
+  color: var(--board-ink);
+  box-shadow: var(--shadow-float);
+}
+/* A thin gold edge along the top */
+.board::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--gold-sheen);
+  opacity: 0.8;
+}
+/* One light-gold sheen crosses the board once, when it first appears */
+.board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--board-sheen);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-110%);
+  animation: board-sheen 1.3s var(--ease) 0.55s 1;
+}
+@keyframes board-sheen {
+  0% {
+    opacity: 1;
+    transform: translateX(-110%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(110%);
+  }
+}
+.board-head {
+  padding-bottom: 14px;
+}
+.board-kicker {
+  margin: 0;
+  color: var(--board-dim);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+.board-scenario {
+  margin: 2px 0 0;
+  max-width: none;
+  overflow: hidden;
+  color: var(--board-ink);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.board-rows {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.board-row {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 76px;
+  padding: 12px 0;
+}
+/* Thin gold dividers between the rows */
+.board-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--gold-sheen);
+  opacity: 0.42;
+}
+.board-label {
+  margin: 0;
+  max-width: none;
+  color: var(--board-ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.board-label small {
+  min-height: 1.45em;
+  color: var(--board-dim);
+  font-size: 13px;
+  font-weight: 400;
+}
+.board .flapboard {
+  flex: none;
+}
+
+/* ── Decision-delay slider ── */
+.delay {
+  grid-column: 1 / -1;
+  padding: 18px 24px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-panel);
+  background: var(--paper);
+  box-shadow: var(--shadow-panel);
+}
+.delay-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 6px;
+}
+.delay-label {
+  display: inline;
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+.delay-when {
+  min-width: 4.2em;
+  color: var(--jade-ink);
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.delay-readout {
+  margin: 0 0 0 auto;
+  max-width: none;
+  color: var(--ink);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.delay:not([data-ready]) .delay-readout {
+  color: var(--ink-dim);
+}
+.delay-readout .count-up {
+  color: var(--verify-ink);
+  font-size: 18px;
+  font-weight: 600;
+}
+.delay-track {
+  position: relative;
+  padding-bottom: 26px;
+}
+.delay input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 28px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.delay input[type="range"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.delay input[type="range"]:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 4px;
+}
+.delay input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--jade) var(--fill, 0%), var(--mist) var(--fill, 0%));
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.delay input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--mist);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.delay input[type="range"]::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--jade);
+}
+/* White thumb with a gold ring */
+.delay input[type="range"]::-webkit-slider-thumb {
+  width: var(--slider-thumb);
+  height: var(--slider-thumb);
+  margin-top: calc((6px - var(--slider-thumb)) / 2);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--paper), var(--paper)) padding-box,
+    var(--gold-sheen) border-box;
+  box-shadow: var(--shadow-float);
+  appearance: none;
+  -webkit-appearance: none;
+  transition: transform 160ms var(--ease);
+}
+.delay input[type="range"]::-moz-range-thumb {
+  width: calc(var(--slider-thumb) - 4px);
+  height: calc(var(--slider-thumb) - 4px);
+  border: 2px solid var(--gold-deep);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-float);
+}
+.delay input[type="range"]:not(:disabled):hover::-webkit-slider-thumb,
+.delay input[type="range"]:not(:disabled):active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+/* Marks and labels sit where the thumb's centre travels */
+.delay-marks,
+.delay-scale {
+  position: absolute;
+  left: calc(var(--slider-thumb) / 2);
+  right: calc(var(--slider-thumb) / 2);
+  pointer-events: none;
+}
+.delay-marks {
+  top: 0;
+  height: 28px;
+}
+.delay-mark {
+  position: absolute;
+  top: 4px;
+  left: calc(var(--p) * 100%);
+  width: 3px;
+  height: 20px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--amber);
+  opacity: 0.45;
+  transform-origin: center;
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease);
+}
+.delay-mark[data-passed] {
+  opacity: 1;
+  transform: scaleY(1.15);
+}
+.delay-scale {
+  top: 32px;
+  height: 20px;
+}
+.delay-scale span {
+  position: absolute;
+  left: calc(var(--p) * 100%);
+  color: var(--ink-dim);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.delay-scale span:first-child {
+  transform: translateX(calc(var(--slider-thumb) / -2));
+}
+.delay-scale span:last-child {
+  transform: translateX(calc(-100% + var(--slider-thumb) / 2));
+}
+.delay-note {
+  margin: 8px 0 0;
+  max-width: none;
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+
+/* ── Scenario list: rows lift, urgency bars, inline preview ── */
+.desk-list tbody tr.desk-row {
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform 180ms var(--ease),
+    box-shadow 180ms var(--ease),
+    background-color 120ms linear;
+}
+.desk-list tbody tr.desk-row:hover,
+.desk-list tbody tr.desk-row[data-open] {
+  background: var(--row-lift);
+  box-shadow: var(--shadow-float);
+  transform: translateY(-2px);
+}
+.desk-list tbody tr.desk-row[data-open] > td {
+  border-bottom-color: transparent;
+}
+/* A slim jade marker on the scenario the hero band is showing */
+.desk-list tbody tr.desk-row[data-focus] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--jade);
+}
+.desk-row-toggle {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: -2px 0 0 -4px;
+  padding: 2px 6px 2px 2px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+}
+.desk-row-toggle:hover {
+  color: var(--jade-ink);
+}
+.desk-row-toggle > svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--ink-dim);
+  transition: transform 200ms var(--ease);
+}
+.desk-row-toggle[aria-expanded="true"] > svg {
+  transform: rotate(90deg);
+}
+.desk-row-toggle + small {
+  margin-left: 20px;
+}
+.desk-cargo {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.desk-cargo .count-up {
+  font-weight: 600;
+}
+.urgency-bar {
+  display: block;
+  width: 132px;
+  max-width: 100%;
+  height: 6px;
+  margin: 7px 0 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--mist);
+}
+.urgency-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--amber);
+  transform-origin: left center;
+  transition: transform 320ms var(--ease);
+}
+:dir(rtl) .urgency-bar > span {
+  transform-origin: right center;
+}
+.desk-list td small.urgency-lost[data-some] {
+  color: var(--verify-ink);
+  font-weight: 500;
+}
+
+.desk-list tbody tr.desk-preview,
+.desk-list tbody tr.desk-preview:hover {
+  background: var(--preview-surface);
+}
+.desk-list tbody tr.desk-preview > td {
+  padding: 0;
+}
+.desk-preview-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: preview-open 280ms var(--ease) backwards;
+}
+@keyframes preview-open {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+.desk-preview-body {
+  min-height: 0;
+  overflow: hidden;
+}
+.desk-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 20px 32px;
+  padding: 20px 24px 24px 38px;
+}
+.desk-preview-grid h3 {
+  margin: 0 0 8px;
+  color: var(--ink-dim);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.desk-preview-grid p {
+  margin: 0;
+  font-size: 14px;
+}
+.desk-dests,
+.desk-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.desk-dests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.desk-dests li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.desk-dests li span {
+  color: var(--ink-dim);
+}
+.desk-lines li {
+  padding: 3px 0;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.desk-lines li small {
+  margin-top: 0;
+}
+.desk-preview-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+.desk-preview-actions .actions {
+  margin: 0;
+}
+
+/* ── Smaller screens ── */
+@media (max-width: 1100px) {
+  .desk-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .delay-readout {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+}
+@media (max-width: 640px) {
+  .board {
+    padding: 20px 18px 10px;
+  }
+  .board .flapboard[data-size="lg"] {
+    font-size: 30px;
+  }
+  .delay {
+    padding: 16px 16px 14px;
+  }
+  .delay-scale span:nth-child(even) {
+    display: none;
+  }
+  .desk-preview-grid {
+    padding-left: 24px;
+  }
+}
+
+/* ── Reduced motion: values still change, nothing travels ── */
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .desk-preview-wrap {
+    animation: none;
+  }
+  .board::after {
+    display: none;
+    animation: none;
+  }
+  .desk-list tbody tr.desk-row,
+  .desk-row-toggle > svg,
+  .urgency-bar > span,
+  .delay-mark,
+  .delay input[type="range"]::-webkit-slider-thumb {
+    transition: none;
+  }
+  .desk-list tbody tr.desk-row:hover,
+  .desk-list tbody tr.desk-row[data-open] {
+    transform: none;
+  }
+}
